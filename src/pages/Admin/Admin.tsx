@@ -1,5 +1,5 @@
-import logo from '@/assets/images/logo.png';
 import BottomNav from '@/components/BottomNav';
+import Header from '@/components/Header';
 import * as admin from '../Admin/style/Admin.css';
 import * as styles from '../Home/style/Home.css';
 import Layout from '../layout/Layout';
@@ -8,8 +8,8 @@ export default function Admin() {
   return (
     <Layout>
       <div className={styles.container}>
-        {/* 로고 */}
-        <img src={logo} alt="다무너" className={styles.logo} />
+        {/* 헤더 */}
+        <Header />
 
         {/* 헤더 */}
         <div className={admin.header}>
