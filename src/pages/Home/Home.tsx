@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router';
-import logo from '@/assets/images/logo.png';
+import BottomNav from '@/components/BottomNav';
+import Header from '@/components/Header';
+import { Loading3D } from '@/components/loading';
 import Layout from '../layout/Layout';
 import * as styles from './style/Home.css';
 
@@ -8,9 +10,16 @@ export default function Home() {
 
   return (
     <Layout>
+      <Header />
+
       <div className={styles.container}>
-        {/* 로고 */}
-        <img src={logo} alt="다무너" className={styles.logo} />
+        <div style={{ width: '200px', height: '200px' }}>
+          <Loading3D
+            textureUrl="src/assets/images/search-moono.png"
+            floatSpeed={1.8}
+            rotation={0.5}
+          />
+        </div>
 
         {/* AI 챗봇 버튼 */}
         <button
@@ -72,21 +81,7 @@ export default function Home() {
         </section>
       </div>
 
-      {/* 하단 네비게이션 */}
-      <nav className={styles.bottomNav}>
-        <button type="button" className={styles.navItem}>
-          <span className={styles.navIcon}>📞</span>
-          <span className={styles.navLabel}>고객센터</span>
-        </button>
-        <button type="button" className={styles.navItem}>
-          <span className={styles.navIcon}>🏠</span>
-          <span className={styles.navLabel}>홈</span>
-        </button>
-        <button type="button" className={styles.navItem}>
-          <span className={styles.navIcon}>👤</span>
-          <span className={styles.navLabel}>마이페이지</span>
-        </button>
-      </nav>
+      <BottomNav />
     </Layout>
   );
 }
