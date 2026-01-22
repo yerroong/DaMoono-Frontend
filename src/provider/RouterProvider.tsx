@@ -6,6 +6,8 @@ import ChatManualPage from '../pages/Chat/ChatManualPage';
 import ChatPage from '../pages/Chat/ChatPage';
 import Home from '../pages/Home/Home';
 import Login from '../pages/Login/Login';
+import Plan from '../pages/Plan/Plan';
+import Subscribe from '../pages/Subscribe/Subscribe';
 import Summary from '../pages/Summary/SummaryPage';
 =======
 import ArmyGuide from '@/pages/Customer/ArmyGuide';
@@ -63,6 +65,14 @@ export default function RouterProvider() {
       path: PAGE_PATHS.MINOR_GUIDE,
       element: <MinorGuide />,
 >>>>>>> 3e2f934 (feat : 고객센터 페이지 구현)
+    },
+    {
+      path: PAGE_PATHS.PLAN,
+      Component: Plan,
+    },
+    {
+      path: PAGE_PATHS.SUBSCRIBE,
+      Component: Subscribe,
     },
   ]);
   return <Provider router={router} />;
