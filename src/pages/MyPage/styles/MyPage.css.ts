@@ -1,14 +1,34 @@
 import { style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
-// 마이페이지 기본 컨테이너 스타일
+// 마이페이지 상담섹션 컨테이너 스타일
 export const container = style({
   padding: '16px',
   background: '#FEFDFD',
 });
 
+// 마이페이지 메뉴/이용 꿀팁 컨테이너 스타일
+export const section = style({
+  background: '#FEFDFD',
+  padding: '16px',
+  margin: '16px',
+  borderRadius: '10px',
+  boxShadow: '0px 2px 2px 0px rgba(0, 0, 0, 0.15)',
+});
+
 /*************************
   상담 조희 섹션 스타일 영역
  *************************/
+export const counselTitle = style({
+  minHeight: '24px',
+  marginLeft: '10px',
+  marginBottom: '8px',
+});
+
+export const counselCnt = style({
+  color: '#E34698',
+});
+
 export const counselCard = style({
   background: '#333',
   height: '70px',
@@ -18,16 +38,6 @@ export const counselCard = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-});
-
-export const counselCnt = style({
-  color: '#E34698',
-});
-
-export const counselTitle = style({
-  minHeight: '24px',
-  marginLeft: '10px',
-  marginBottom: '8px',
 });
 
 export const counselText = style({
@@ -77,6 +87,61 @@ export const counselBtn = style({
   },
 });
 
+/********************
+  메뉴 탭 스타일 영역
+ ********************/
+export const tabs = style({
+  display: 'flex',
+  gap: '5px',
+  padding: '4px',
+  background: 'rgba(228, 231, 243, 0.5)',
+  borderRadius: '5px',
+  marginTop: '15px',
+});
+
+export const tab = recipe({
+  base: {
+    flex: 1,
+    padding: '12px 0px',
+    background: '#fafafa',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+  },
+  variants: {
+    active: {
+      true: {
+        background: '#fff',
+        borderColor: '#333',
+        boxShadow: '0px 0px 4px 0px rgba(0, 0, 0, 0.3)',
+      },
+      false: {
+        background: 'transparent',
+        border: 'none',
+        color: 'rgba(0, 0, 0, 0.5)',
+      },
+    },
+  },
+});
+
+/********************
+  메뉴리스트 스타일 영역
+ ********************/
+export const menuList = style({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  background: '#fff',
+  overflow: 'hidden',
+  margin: '15px 20px',
+  minHeight: '100px',
+  fontSize: '16px',
+});
+
+/*************
+  로그아웃 버튼
+ *************/
 export const logout = style({
   width: '100%',
   marginTop: '24px',
