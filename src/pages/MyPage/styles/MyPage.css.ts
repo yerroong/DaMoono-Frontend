@@ -134,10 +134,31 @@ export const menuList = style({
   justifyContent: 'center',
   background: '#fff',
   overflow: 'hidden',
-  margin: '15px 20px',
+  margin: '15px 20px 0 20px',
   minHeight: '100px',
   fontSize: '16px',
 });
+
+export const menuItem = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '14px 12px',
+});
+
+export const menuLeft = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+});
+
+export const icon = style({
+  fontSize: '16px',
+});
+
+/********************
+  이용 꿀팁 스타일 영역
+ ********************/
 
 /*************
   로그아웃 버튼

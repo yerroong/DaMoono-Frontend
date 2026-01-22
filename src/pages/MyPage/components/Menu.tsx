@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import * as temp from '../styles/Menu.css';
 import * as css from '../styles/MyPage.css';
 
 export type MenuType = '요금제' | '구독' | '성향';
@@ -23,30 +22,32 @@ export function Menu() {
 
   return (
     <section className={css.section}>
-      <h2>메뉴</h2>
+      <div className={css.container}>
+        <h2>메뉴</h2>
 
-      <div className={css.tabs}>
-        {TAB_LIST.map((tab) => (
-          <button
-            key={tab}
-            className={css.tab({ active: activeTab === tab })}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
+        <div className={css.tabs}>
+          {TAB_LIST.map((tab) => (
+            <button
+              key={tab}
+              className={css.tab({ active: activeTab === tab })}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        <ul className={css.menuList}>
+          {MENU_MAP[activeTab].map((item) => (
+            <li key={item.label} className={css.menuItem}>
+              <span className={css.menuLeft}>
+                <span className={css.icon}>{item.icon}</span>
+                {item.label}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      <ul className={css.menuList}>
-        {MENU_MAP[activeTab].map((item) => (
-          <li key={item.label} className={temp.menuItem}>
-            <span className={temp.menuLeft}>
-              <span className={temp.icon}>{item.icon}</span>
-              {item.label}
-            </span>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
