@@ -3,4 +3,6 @@ export const PAGE_PATHS = {
   HOME: '/home',
   SUMMARY: '/summary',
   ADMIN: '/admin',
+  PLAN: '/plan',
+  SUBSCRIBE: '/subscribe',
 };
