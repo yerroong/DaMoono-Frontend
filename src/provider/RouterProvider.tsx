@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router';
 import { RouterProvider as Provider } from 'react-router/dom';
 import Admin from '../pages/Admin/Admin';
+import ChatAdminPage from '../pages/Chat/ChatAdminPage';
+import ChatConsultPage from '../pages/Chat/ChatConsultPage';
 import ChatManualPage from '../pages/Chat/ChatManualPage';
 import ChatPage from '../pages/Chat/ChatPage';
 import Home from '../pages/Home/Home';
@@ -27,6 +29,14 @@ export default function RouterProvider() {
     {
       path: PAGE_PATHS.CHAT_MANUAL,
       Component: ChatManualPage,
+    },
+    {
+      path: '/chat/consult',
+      Component: ChatConsultPage,
+    },
+    {
+      path: '/chat/admin',
+      Component: ChatAdminPage,
     },
     {
       path: PAGE_PATHS.SUMMARY,
