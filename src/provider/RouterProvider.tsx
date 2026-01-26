@@ -5,14 +5,23 @@ import CustomerService from '@/pages/Customer/CustomerService';
 import MinorGuide from '@/pages/Customer/MinorGuide';
 import ProxyGuide from '@/pages/Customer/ProxyGuide';
 import MyPage from '@/pages/MyPage/MyPage';
+import Counsel from '@/pages/MyPage/pages/Counsel';
+import ProtectedRoute from '@/shared/routes/ProtectedRoute';
 import Admin from '../pages/Admin/Admin';
+import ChatAdminPage from '../pages/Chat/ChatAdminPage';
+import ChatConsultPage from '../pages/Chat/ChatConsultPage';
 import ChatManualPage from '../pages/Chat/ChatManualPage';
 import ChatPage from '../pages/Chat/ChatPage';
 import Home from '../pages/Home/Home';
 import Login from '../pages/Login/Login';
+import LoginForm from '../pages/Login/LoginForm';
+import Signup from '../pages/Login/Signup';
+import Tips from '../pages/MyPage/pages/Tips';
 import PersonalityTest from '../pages/PersonalityTest/PersonalityTest';
 import Plan from '../pages/Plan/Plan';
+import PlanDetail from '../pages/Plan/PlanDetail';
 import Subscribe from '../pages/Subscribe/Subscribe';
+import SubscribeDetail from '../pages/Subscribe/SubscribeDetail';
 import Summary from '../pages/Summary/SummaryPage';
 import { PAGE_PATHS } from '../shared/config/paths';
 
@@ -21,6 +30,14 @@ export default function RouterProvider() {
     {
       path: PAGE_PATHS.LOGIN,
       Component: Login,
+    },
+    {
+      path: PAGE_PATHS.LOGIN_FORM,
+      Component: LoginForm,
+    },
+    {
+      path: PAGE_PATHS.SIGNUP,
+      Component: Signup,
     },
     {
       path: PAGE_PATHS.HOME,
@@ -35,6 +52,14 @@ export default function RouterProvider() {
       Component: ChatManualPage,
     },
     {
+      path: '/chat/consult',
+      Component: ChatConsultPage,
+    },
+    {
+      path: '/chat/admin',
+      Component: ChatAdminPage,
+    },
+    {
       path: PAGE_PATHS.SUMMARY,
       Component: Summary,
     },
@@ -45,6 +70,10 @@ export default function RouterProvider() {
     {
       path: PAGE_PATHS.MYPAGE,
       Component: MyPage,
+    },
+    {
+      path: PAGE_PATHS.LOGIN_GUARD,
+      element: <ProtectedRoute />,
     },
     {
       path: PAGE_PATHS.CUSTOMER_SERVICE,
@@ -69,12 +98,28 @@ export default function RouterProvider() {
       Component: Plan,
     },
     {
+      path: PAGE_PATHS.PLAN_DETAIL,
+      Component: PlanDetail,
+    },
+    {
       path: PAGE_PATHS.SUBSCRIBE,
       Component: Subscribe,
     },
     {
+      path: PAGE_PATHS.SUBSCRIBE_DETAIL,
+      Component: SubscribeDetail,
+    },
+    {
+      path: PAGE_PATHS.COUNSEL,
+      Component: Counsel,
+    },
+    {
       path: PAGE_PATHS.PERSONALITY_TEST,
       Component: PersonalityTest,
+    },
+    {
+      path: PAGE_PATHS.TIPS_GUIDE,
+      Component: Tips,
     },
   ]);
   return <Provider router={router} />;
