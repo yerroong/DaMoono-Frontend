@@ -11,7 +11,7 @@ export function LogoutBtn() {
       localStorage.removeItem('userName');
       localStorage.removeItem('userRole');
       navigate('/');
-    } catch (error) {
+    } catch (_error) {
       alert('로그아웃 중 오류가 발생했습니다.');
     }
   };
