@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import mascot from '@/assets/images/search-moono.png';
+import { checkUserId, signup } from '@/services/authApi';
 import { PAGE_PATHS } from '@/shared/config/paths';
 import Layout from '../layout/Layout';
 import * as styles from './style/Signup.css';
@@ -11,20 +12,91 @@ export default function Signup() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [isIdChecked, setIsIdChecked] = useState(false);
+  const [isIdAvailable, setIsIdAvailable] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignup = () => {
-    // TODO: 회원가입 로직 구현
+  const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserId(e.target.value);
+    setIsIdChecked(false);
+    setIsIdAvailable(false);
+  };
+
+  const handleCheckDuplicate = async () => {
+    if (!userId.trim()) {
+      alert('아이디를 입력해주세요.');
+      return;
+    }
+
+    if (userId.length < 4) {
+      alert('아이디는 4자 이상이어야 합니다.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const data = await checkUserId(userId);
+      if (data.available) {
+        alert('사용 가능한 아이디입니다.');
+        setIsIdChecked(true);
+        setIsIdAvailable(true);
+      } else {
+        alert('이미 사용 중인 아이디입니다.');
+        setIsIdChecked(true);
+        setIsIdAvailable(false);
+      }
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : '중복 확인 중 오류가 발생했습니다.',
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignup = async () => {
+    // 유효성 검사
+    if (!name.trim() || !userId.trim() || !password || !passwordConfirm) {
+      alert('모든 항목을 입력해주세요.');
+      return;
+    }
+
+    if (name.length < 2) {
+      alert('이름은 2자 이상이어야 합니다.');
+      return;
+    }
+
+    if (!isIdChecked || !isIdAvailable) {
+      alert('아이디 중복 확인을 해주세요.');
+      return;
+    }
+
+    if (password.length < 8) {
+      alert('비밀번호는 8자 이상이어야 합니다.');
+      return;
+    }
+
     if (password !== passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    console.log('회원가입:', { name, userId, password });
-    navigate(PAGE_PATHS.LOGIN_FORM);
-  };
 
-  const handleCheckDuplicate = () => {
-    // TODO: 중복 확인 로직
-    console.log('중복 확인:', userId);
+    setIsLoading(true);
+    try {
+      await signup({ name, userId, password });
+      alert('회원가입이 완료되었습니다.');
+      navigate(PAGE_PATHS.LOGIN_FORM);
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : '회원가입 중 오류가 발생했습니다.',
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -59,12 +131,14 @@ export default function Signup() {
                 type="text"
                 className={styles.inputFlex}
                 value={userId}
-                onChange={(e) => setUserId(e.target.value)}
+                onChange={handleUserIdChange}
+                disabled={isLoading}
               />
               <button
                 type="button"
                 className={styles.checkButton}
                 onClick={handleCheckDuplicate}
+                disabled={isLoading}
               >
                 중복 확인
               </button>
@@ -81,6 +155,7 @@ export default function Signup() {
               className={styles.input}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
@@ -94,6 +169,7 @@ export default function Signup() {
               className={styles.input}
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
@@ -101,8 +177,9 @@ export default function Signup() {
             type="button"
             className={styles.signupButton}
             onClick={handleSignup}
+            disabled={isLoading}
           >
-            회원가입
+            {isLoading ? '처리 중...' : '회원가입'}
           </button>
         </div>
       </div>
