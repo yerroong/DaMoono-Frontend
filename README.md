@@ -1,7 +1,7 @@
 <div align="center">
 
-# AI 기반 통신사 요금제 추천 및 실시간 상담 서비스, 다무너 (DaMoono) 🐙
-
+## AI 기반 통신사 요금제 추천 및 실시간 상담 서비스, 다무너 (DaMoono) 🐙
+이미지 바꿀꺼 ㅇㅇ 예시;
 <img width="1300" height="853" alt="DaMoono Main" src="https://github.com/user-attachments/assets/1c3938b5-b14c-405f-aa1c-13d8ee3291c8" />
 
 **다무너(DaMoono)** 는  
