@@ -43,6 +43,93 @@ export const title = style({
   textAlign: 'center',
 });
 
+export const currentPlanTitle = style({
+  fontSize: '20px',
+  fontWeight: '700',
+  color: '#333',
+  margin: 0,
+  marginBottom: '12px',
+  textAlign: 'center',
+});
+
+export const compareButton = style({
+  padding: '12px 24px',
+  backgroundColor: '#fce7f3',
+  color: '#333',
+  border: '2px solid #E91685',
+  borderRadius: '12px',
+  fontSize: '16px',
+  fontWeight: '700',
+  cursor: 'pointer',
+  marginBottom: '24px',
+  transition: 'background-color 0.2s, border-color 0.2s',
+  ':hover': {
+    backgroundColor: '#fbcfe8',
+    borderColor: '#E91685',
+  },
+});
+
+export const compareButtonActive = style({
+  backgroundColor: '#E91685',
+  color: '#fff',
+  ':hover': {
+    backgroundColor: '#d11473',
+  },
+});
+
+export const compareActions = style({
+  position: 'fixed',
+  bottom: '80px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  width: '100%',
+  maxWidth: '480px',
+  display: 'flex',
+  gap: '12px',
+  padding: '16px',
+  backgroundColor: '#fff',
+  boxShadow: '0 -4px 10px rgba(0, 0, 0, 0.1)',
+  zIndex: 999,
+});
+
+export const compareConfirmButton = style({
+  flex: 1,
+  padding: '16px',
+  backgroundColor: '#E91685',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '12px',
+  fontSize: '18px',
+  fontWeight: '700',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s, opacity 0.2s',
+  ':hover': {
+    backgroundColor: '#d11473',
+  },
+  ':disabled': {
+    backgroundColor: '#e5e7eb',
+    color: '#9ca3af',
+    cursor: 'not-allowed',
+    opacity: 0.6,
+  },
+});
+
+export const compareCancelButton = style({
+  flex: 1,
+  padding: '16px',
+  backgroundColor: '#E91685',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '12px',
+  fontSize: '18px',
+  fontWeight: '700',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s',
+  ':hover': {
+    backgroundColor: '#d11473',
+  },
+});
+
 export const filterPanel = style({
   position: 'sticky',
   top: 0,
@@ -151,7 +238,7 @@ export const planCard = style({
   backgroundColor: '#fff',
   padding: '20px 28px',
   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-  transition: 'box-shadow 0.2s',
+  transition: 'box-shadow 0.2s, border-color 0.2s',
   textAlign: 'left',
   ':hover': {
     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
@@ -173,7 +260,7 @@ export const planProvider = style({
 export const planPrice = style({
   fontSize: '14px',
   fontWeight: '600',
-  color: '#db2777',
+  color: '#E91685',
 });
 
 export const planName = style({
@@ -264,4 +351,29 @@ export const skeleton = style({
   backgroundColor: '#fff',
   padding: '16px',
   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+});
+
+export const currentPlanCard = style({
+  width: '100%',
+  maxWidth: '288px',
+  cursor: 'pointer',
+  borderRadius: '16px',
+  border: '1px solid #9ca3af',
+  backgroundColor: '#fff',
+  padding: '20px 28px',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  transition: 'box-shadow 0.2s, border-color 0.2s',
+  textAlign: 'left',
+  ':hover': {
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+  },
+});
+
+export const planCardSelected = style({
+  border: '2px solid #E91685',
+});
+
+export const planCardCompareSelected = style({
+  border: '2px solid #E91685',
+  backgroundColor: '#fef2f2',
 });

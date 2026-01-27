@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
@@ -16,6 +16,73 @@ import type {
   SortTarget,
   Subscribe as SubscribeType,
 } from './types';
+
+// 현재 사용 중인 구독 카드 컴포넌트
+interface CurrentSubscribeCardProps {
+  subscribe: SubscribeType;
+  isSelected: boolean;
+  onClick?: (subscribe: SubscribeType) => void;
+}
+
+function CurrentSubscribeCard({
+  subscribe,
+  isSelected,
+  onClick,
+}: CurrentSubscribeCardProps) {
+  const { name, monthlyPrice, category, badges } = subscribe;
+  const subscribeImage = SUBSCRIBE_IMAGES[name] || null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onClick?.(subscribe)}
+      className={`${styles.currentSubscribeCard} ${isSelected ? styles.subscribeCardSelected : ''}`}
+    >
+      <div className={styles.cardHeader}>
+        <span className={styles.category}>{CATEGORY_LABELS[category]}</span>
+        <span className={styles.price}>
+          월 {monthlyPrice.toLocaleString()}원
+        </span>
+      </div>
+      <div className={styles.subscribeName} title={name}>
+        {name}
+      </div>
+
+      {/* 배지 */}
+      <div className={styles.badgeContainer}>
+        {badges.length > 0 ? (
+          badges.map((badge) => (
+            <span
+              key={badge}
+              className={`${styles.badge} ${styles.badgeHighlight}`}
+            >
+              {badge}
+            </span>
+          ))
+        ) : (
+          <span className={`${styles.badge} ${styles.badgeCategory}`}>
+            {CATEGORY_LABELS[category]}
+          </span>
+        )}
+      </div>
+
+      {/* 구독 서비스 원형 아이콘 */}
+      <div className={styles.subscribeContainer}>
+        <div className={styles.subscribeCircle} title={name}>
+          {subscribeImage ? (
+            <img
+              src={subscribeImage}
+              alt={name}
+              className={styles.subscribeImage}
+            />
+          ) : (
+            name.charAt(0)
+          )}
+        </div>
+      </div>
+    </button>
+  );
+}
 
 // 정렬/필터 패널 컴포넌트
 interface SortFilterPanelProps {
@@ -237,7 +304,56 @@ export default function Subscribe() {
     [],
   );
   const [isLoading] = useState(false);
+  const [selectedSubscribeId, setSelectedSubscribeId] = useState<number | null>(
+    null,
+  );
   const listRef = useRef<HTMLDivElement>(null);
+
+  // 현재 사용 중인 구독 상태
+  const [currentSubscribe, setCurrentSubscribe] = useState<SubscribeType>(
+    () => {
+      const savedSubscribeId = localStorage.getItem('currentSubscribeId');
+      if (savedSubscribeId) {
+        const subscribeId = parseInt(savedSubscribeId, 10);
+        const savedSubscribe = MOCK_SUBSCRIBES.find(
+          (s) => s.id === subscribeId,
+        );
+        if (savedSubscribe) {
+          return savedSubscribe;
+        }
+      }
+      // 저장된 구독이 없으면 랜덤 선택
+      const randomIndex = Math.floor(Math.random() * MOCK_SUBSCRIBES.length);
+      return MOCK_SUBSCRIBES[randomIndex];
+    },
+  );
+
+  // localStorage에서 현재 사용중인 구독 가져오기
+  const loadCurrentSubscribe = useCallback(() => {
+    const savedSubscribeId = localStorage.getItem('currentSubscribeId');
+    if (savedSubscribeId) {
+      const subscribeId = parseInt(savedSubscribeId, 10);
+      const savedSubscribe = MOCK_SUBSCRIBES.find((s) => s.id === subscribeId);
+      if (savedSubscribe) {
+        setCurrentSubscribe(savedSubscribe);
+        return;
+      }
+    }
+  }, []);
+
+  // 컴포넌트 마운트 시 및 페이지 포커스 시 localStorage 확인
+  useEffect(() => {
+    loadCurrentSubscribe();
+
+    const handleFocus = () => {
+      loadCurrentSubscribe();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [loadCurrentSubscribe]);
 
   // 필터링 및 정렬 로직
   const filteredAndSortedSubscribes = useMemo(() => {
@@ -285,6 +401,7 @@ export default function Subscribe() {
   }, [selectedCategories, sortTarget, sortOrder]);
 
   const handleSubscribeClick = (subscribe: SubscribeType) => {
+    setSelectedSubscribeId(subscribe.id);
     navigate(`/subscribe/${subscribe.id}`);
   };
 
@@ -310,6 +427,24 @@ export default function Subscribe() {
               size="lg"
               floatSpeed={1.8}
               rotation={0.3}
+            />
+          </div>
+
+          {/* 현재 사용 중인 구독 */}
+          <div
+            style={{
+              marginBottom: '24px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <h2 className={styles.currentSubscribeTitle}>현재 사용중인 구독</h2>
+            <CurrentSubscribeCard
+              subscribe={currentSubscribe}
+              isSelected={selectedSubscribeId === currentSubscribe.id}
+              onClick={handleSubscribeClick}
             />
           </div>
 

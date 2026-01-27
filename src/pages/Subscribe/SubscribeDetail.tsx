@@ -113,7 +113,19 @@ export default function SubscribeDetail() {
           )}
 
           {/* 신청 버튼 */}
-          <button type="button" className={styles.applyButton}>
+          <button
+            type="button"
+            className={styles.applyButton}
+            onClick={() => {
+              // localStorage에 현재 사용중인 구독 저장
+              localStorage.setItem(
+                'currentSubscribeId',
+                subscribe.id.toString(),
+              );
+              // Subscribe 페이지로 이동
+              navigate(PAGE_PATHS.SUBSCRIBE);
+            }}
+          >
             이 구독 서비스 신청하기
           </button>
         </div>

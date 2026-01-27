@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useNavigate, useSearchParams } from 'react-router';
 import chatIcon from '@/assets/images/chat.png';
+import counselingIcon from '@/assets/images/counseling-icon.png';
+import counselingMoono from '@/assets/images/counseling-moono.png';
+import noCounselingMoono from '@/assets/images/no-counseling-moono.png';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
 import socketService from '@/services/socketService';
@@ -157,47 +160,39 @@ export default function ChatAdminPage() {
         {showSessionList ? (
           <>
             <div className={styles.header}>
-              <div className={styles.headerLeft}>
-                <img src={chatIcon} alt="채팅" className={styles.headerIcon} />
-                <span className={styles.headerTitle}>상담 대기 목록</span>
-              </div>
+              <img
+                src={counselingMoono}
+                alt="무너"
+                className={styles.headerIcon}
+              />
+              <h2>김영희 상담사</h2>
             </div>
-
             <div className={styles.content}>
               {waitingSessions.length === 0 ? (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    padding: '40px 20px',
-                    color: '#999',
-                  }}
-                >
-                  <p>대기 중인 상담이 없습니다.</p>
+                <div className={styles.chatBox}>
+                  <div className={styles.chatState}>
+                    <div className={styles.noChatDot} />
+                    <span>현재 요청된 상담</span>
+                  </div>
+                  <img
+                    src={noCounselingMoono}
+                    alt="무너"
+                    className={styles.chatStateIcon}
+                  />
+                  <p>현재 요청된 상담이 없습니다.</p>
                 </div>
               ) : (
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                  }}
-                >
+                <div className={styles.chatBox}>
+                  <div className={styles.chatState}>
+                    <div className={styles.statusDot} />
+                    <span>현재 요청된 상담</span>
+                  </div>
                   {waitingSessions.map((session) => (
                     <button
                       type="button"
                       key={session.sessionId}
                       onClick={() => handleJoinSession(session.sessionId)}
-                      style={{
-                        padding: '16px',
-                        backgroundColor: '#fff',
-                        borderRadius: '12px',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        border: 'none',
-                        width: '100%',
-                        textAlign: 'left',
-                      }}
+                      className={styles.chatCard}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-2px)';
                         e.currentTarget.style.boxShadow =
@@ -209,45 +204,18 @@ export default function ChatAdminPage() {
                           '0 2px 8px rgba(0, 0, 0, 0.1)';
                       }}
                     >
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <div>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: '14px',
-                              fontWeight: 600,
-                              color: '#333',
-                            }}
-                          >
+                      <div className={styles.counselingWrapper}>
+                        <div className={styles.counselingIdBox}>
+                          <img
+                            src={counselingIcon}
+                            alt="무너"
+                            className={styles.chatIcon}
+                          />
+                          <p className={styles.counselingId}>
                             {session.userId}
                           </p>
-                          <p
-                            style={{
-                              margin: '4px 0 0 0',
-                              fontSize: '12px',
-                              color: '#999',
-                            }}
-                          >
-                            세션 ID: {session.sessionId}
-                          </p>
                         </div>
-                        <div
-                          style={{
-                            padding: '6px 12px',
-                            backgroundColor: '#FFE253',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            fontWeight: 500,
-                          }}
-                        >
-                          대기 중
-                        </div>
+                        <div className={styles.counselingBtn}>상담 시작</div>
                       </div>
                     </button>
                   ))}
@@ -273,7 +241,7 @@ export default function ChatAdminPage() {
                 >
                   ←
                 </button>
-                <img src={chatIcon} alt="채팅" className={styles.headerIcon} />
+                <img src={chatIcon} alt="채팅" className={styles.chatIcon} />
                 <span className={styles.headerTitle}>상담 진행하기</span>
               </div>
               <button

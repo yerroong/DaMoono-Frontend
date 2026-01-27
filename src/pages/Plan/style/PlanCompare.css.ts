@@ -13,7 +13,7 @@ export const container = style({
 
 export const header = style({
   width: '100%',
-  maxWidth: '480px',
+  maxWidth: '960px',
   marginBottom: '24px',
   display: 'flex',
   alignItems: 'center',
@@ -39,9 +39,16 @@ export const title = style({
   margin: 0,
 });
 
-export const card = style({
+export const cardsContainer = style({
   width: '100%',
-  maxWidth: '480px',
+  maxWidth: '960px',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+  gap: '24px',
+  marginBottom: '32px',
+});
+
+export const planCard = style({
   backgroundColor: '#fff',
   borderRadius: '16px',
   padding: '24px',
@@ -57,7 +64,7 @@ export const cardHeader = style({
   borderBottom: '1px solid #e5e7eb',
 });
 
-export const category = style({
+export const provider = style({
   fontSize: '14px',
   color: '#6b7280',
 });
@@ -68,19 +75,12 @@ export const price = style({
   color: '#E91685',
 });
 
-export const subscribeName = style({
+export const planName = style({
   fontSize: '24px',
   fontWeight: '700',
   color: '#111827',
   margin: 0,
   marginBottom: '16px',
-});
-
-export const badgeContainer = style({
-  display: 'flex',
-  gap: '8px',
-  marginBottom: '24px',
-  flexWrap: 'wrap',
 });
 
 export const badge = style({
@@ -91,66 +91,49 @@ export const badge = style({
   color: '#92400e',
   fontSize: '14px',
   fontWeight: '600',
+  marginBottom: '16px',
 });
 
-export const section = style({
-  marginBottom: '24px',
-});
-
-export const sectionTitle = style({
-  fontSize: '14px',
-  fontWeight: '600',
-  color: '#6b7280',
-  marginBottom: '8px',
-});
-
-export const description = style({
-  fontSize: '16px',
-  color: '#111827',
-  lineHeight: '1.6',
-});
-
-export const value = style({
-  fontSize: '18px',
-  fontWeight: '600',
-  color: '#111827',
-});
-
-export const subValue = style({
-  fontSize: '14px',
-  color: '#6b7280',
-  marginTop: '4px',
-});
-
-export const benefitsList = style({
+export const details = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '8px',
+  gap: '12px',
 });
 
-export const benefitItem = style({
-  padding: '12px',
-  backgroundColor: '#f3f4f6',
-  borderRadius: '8px',
+export const detailItem = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
+
+export const detailLabel = style({
   fontSize: '14px',
-  color: '#111827',
+  color: '#6b7280',
+  fontWeight: '600',
 });
 
-export const applyButton = style({
+export const detailValue = style({
+  fontSize: '16px',
+  color: '#111827',
+  fontWeight: '600',
+});
+
+export const chartContainer = style({
   width: '100%',
-  padding: '16px',
-  backgroundColor: '#E91685',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '12px',
-  fontSize: '18px',
+  maxWidth: '960px',
+  backgroundColor: '#fff',
+  borderRadius: '16px',
+  padding: '24px',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+});
+
+export const chartTitle = style({
+  fontSize: '20px',
   fontWeight: '700',
-  cursor: 'pointer',
-  marginTop: '24px',
-  transition: 'background-color 0.2s',
-  ':hover': {
-    backgroundColor: '#d11473',
-  },
+  color: '#333',
+  margin: 0,
+  marginBottom: '24px',
+  textAlign: 'center',
 });
 
 export const errorMessage = style({

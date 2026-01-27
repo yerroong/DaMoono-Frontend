@@ -15,16 +15,68 @@ export const container = style({
   minHeight: '100vh',
   backgroundColor: '#FEFDFD',
   position: 'relative',
-  paddingTop: '60px',
 });
 
+/*********************
+ 상담사 페이지 헤더 부분
+**********************/
 export const header = style({
   display: 'flex',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
   alignItems: 'center',
-  gap: '8px',
+  gap: '40px',
   padding: '16px 20px',
+  marginTop: '60px',
   backgroundColor: '#fff',
+});
+
+/***********************
+ 상담사 페이지 요청상담섹션
+************************/
+export const chatBox = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '12px',
+  border: '0.5px solid #0000000f',
+  borderRadius: '15px',
+  margin: '0 14px',
+  padding: '30px 0',
+  boxShadow: '0 3px 4px rgba(0, 0, 0, 0.1)',
+});
+
+export const chatState = style({
+  display: 'flex',
+  alignItems: 'center',
+  alignSelf: 'flex-start',
+  gap: '10px',
+  fontWeight: 'bold',
+  marginLeft: '20px',
+  marginBottom: '5px',
+});
+
+export const noChatDot = style({
+  width: '10px',
+  height: '10px',
+  borderRadius: '50%',
+  backgroundColor: '#FF1F1F',
+});
+
+export const chatStateIcon = style({
+  width: '150px',
+  height: '110px',
+});
+
+export const chatCard = style({
+  padding: '12px',
+  backgroundColor: '#fff',
+  borderRadius: '12px',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+  cursor: 'pointer',
+  transition: 'all 0.2s',
+  border: '1px solid #FFDA94',
+  width: '90%',
+  textAlign: 'left',
 });
 
 export const headerLeft = style({
@@ -35,6 +87,12 @@ export const headerLeft = style({
 });
 
 export const headerIcon = style({
+  width: '200px',
+  height: '200px',
+  objectFit: 'contain',
+});
+
+export const chatIcon = style({
   width: '20px',
   height: '20px',
   objectFit: 'contain',
@@ -46,6 +104,43 @@ export const headerTitle = style({
   fontWeight: 400,
   color: '#333',
   margin: 0,
+});
+
+/******************
+ 요청상담 카드 스타일
+*******************/
+export const counselingWrapper = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
+
+export const counselingIdBox = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+});
+
+export const counselingId = style({
+  fontSize: '16px',
+  fontWeight: '500',
+});
+
+export const counselingBtn = style({
+  padding: '5px 16px',
+  boxShadow: '0 4px 4px rgba(0, 0, 0, 0.1)',
+  borderRadius: '20px',
+  background: `linear-gradient(
+    90deg,
+    rgba(255, 166, 41, 0.2) 0%,
+    rgba(255, 255, 255, 0.2) 36%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.2) 66%,
+    rgba(255, 166, 41, 0.2) 100%
+  )`,
+
+  color: '#FFA629',
+  fontWeight: '500',
 });
 
 export const endButton = style({

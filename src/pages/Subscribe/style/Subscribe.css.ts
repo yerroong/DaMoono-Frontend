@@ -173,7 +173,7 @@ export const category = style({
 export const price = style({
   fontSize: '14px',
   fontWeight: '600',
-  color: '#db2777',
+  color: '#E91685',
 });
 
 export const subscribeName = style({
@@ -258,4 +258,33 @@ export const skeleton = style({
   backgroundColor: '#fff',
   padding: '16px',
   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+});
+
+export const currentSubscribeTitle = style({
+  fontSize: '20px',
+  fontWeight: '700',
+  color: '#333',
+  margin: 0,
+  marginBottom: '12px',
+  textAlign: 'center',
+});
+
+export const currentSubscribeCard = style({
+  width: '100%',
+  maxWidth: '288px',
+  cursor: 'pointer',
+  borderRadius: '16px',
+  border: '1px solid #9ca3af',
+  backgroundColor: '#fff',
+  padding: '20px 28px',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  transition: 'box-shadow 0.2s, border-color 0.2s',
+  textAlign: 'left',
+  ':hover': {
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+  },
+});
+
+export const subscribeCardSelected = style({
+  border: '2px solid #E91685',
 });

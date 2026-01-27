@@ -18,7 +18,7 @@ export default function BottomNav() {
       <button
         type="button"
         className={styles.navItem}
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/home')}
       >
         <span className={styles.navIcon}>🏠</span>
         <span className={styles.navLabel}>홈</span>

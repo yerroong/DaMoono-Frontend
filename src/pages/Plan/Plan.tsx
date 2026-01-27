@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
@@ -13,6 +13,82 @@ import type {
   Plan as PlanType,
   SortTarget,
 } from './types';
+
+// 현재 사용 중인 요금제 카드 컴포넌트
+interface CurrentPlanCardProps {
+  plan: PlanType;
+  isSelected: boolean;
+  isCompareMode?: boolean;
+  isCompareSelected?: boolean;
+  onClick?: (plan: PlanType) => void;
+}
+
+function CurrentPlanCard({
+  plan,
+  isSelected,
+  isCompareMode = false,
+  isCompareSelected = false,
+  onClick,
+}: CurrentPlanCardProps) {
+  const {
+    name,
+    price,
+    dataAmountMb,
+    voiceMinutes,
+    smsIncluded,
+    overageSpeedMbps,
+    subscriptionServices,
+  } = plan;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onClick?.(plan)}
+      className={`${styles.currentPlanCard} ${isSelected ? styles.planCardSelected : ''} ${isCompareMode && isCompareSelected ? styles.planCardCompareSelected : ''}`}
+    >
+      <div className={styles.planCardHeader}>
+        <span className={styles.planProvider}>LG U+</span>
+        <span className={styles.planPrice}>월 {price.toLocaleString()}원</span>
+      </div>
+      <div className={styles.planName} title={name}>
+        {name}
+      </div>
+
+      {/* 배지 */}
+      <div className={styles.badgeContainer}>
+        <span className={`${styles.badge} ${styles.badgeData}`}>
+          {dataAmountMb === 0
+            ? '무제한'
+            : `${(dataAmountMb / 1024).toFixed(1)}GB`}
+        </span>
+        <span className={`${styles.badge} ${styles.badgeVoice}`}>
+          {voiceMinutes === -1 ? '무제한' : `${voiceMinutes}분`}
+        </span>
+        <span className={`${styles.badge} ${styles.badgeSpeed}`}>
+          속도 {overageSpeedMbps ?? 0}Mbps
+        </span>
+        <span className={`${styles.badge} ${styles.badgeSms}`}>
+          혜택 가치 {smsIncluded}
+        </span>
+      </div>
+
+      {/* OTT 서비스 */}
+      {subscriptionServices.length > 0 && (
+        <div className={styles.ottContainer}>
+          {subscriptionServices.map((service, index) => (
+            <div
+              key={service}
+              className={`${styles.ottCircle} ${index !== 0 ? styles.ottCircleOverlap : ''}`}
+              title={OTT_LABELS[service]}
+            >
+              {OTT_LABELS[service].charAt(0)}
+            </div>
+          ))}
+        </div>
+      )}
+    </button>
+  );
+}
 
 // 정렬/필터 패널 컴포넌트
 interface SortFilterPanelProps {
@@ -188,10 +264,19 @@ function SortFilterPanel({
 // 요금제 카드 컴포넌트
 interface PlanCardProps {
   plan: PlanType;
+  isSelected: boolean;
+  isCompareMode?: boolean;
+  isCompareSelected?: boolean;
   onClick?: (plan: PlanType) => void;
 }
 
-function PlanCard({ plan, onClick }: PlanCardProps) {
+function PlanCard({
+  plan,
+  isSelected,
+  isCompareMode = false,
+  isCompareSelected = false,
+  onClick,
+}: PlanCardProps) {
   const {
     name,
     price,
@@ -206,7 +291,7 @@ function PlanCard({ plan, onClick }: PlanCardProps) {
     <button
       type="button"
       onClick={() => onClick?.(plan)}
-      className={styles.planCard}
+      className={`${styles.planCard} ${isSelected ? styles.planCardSelected : ''} ${isCompareMode && isCompareSelected ? styles.planCardCompareSelected : ''}`}
     >
       <div className={styles.planCardHeader}>
         <span className={styles.planProvider}>LG U+</span>
@@ -262,7 +347,52 @@ export default function Plan() {
   );
   const [selectedOttList, setSelectedOttList] = useState<OTTType[]>([]);
   const [isLoading] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [comparePlans, setComparePlans] = useState<number[]>([]);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // 현재 사용 중인 요금제 상태
+  const [currentPlan, setCurrentPlan] = useState<PlanType>(() => {
+    const savedPlanId = localStorage.getItem('currentPlanId');
+    if (savedPlanId) {
+      const planId = parseInt(savedPlanId, 10);
+      const savedPlan = MOCK_PLANS.find((p) => p.id === planId);
+      if (savedPlan) {
+        return savedPlan;
+      }
+    }
+    // 저장된 요금제가 없으면 랜덤 선택
+    const randomIndex = Math.floor(Math.random() * MOCK_PLANS.length);
+    return MOCK_PLANS[randomIndex];
+  });
+
+  // localStorage에서 현재 사용중인 요금제 가져오기
+  const loadCurrentPlan = useCallback(() => {
+    const savedPlanId = localStorage.getItem('currentPlanId');
+    if (savedPlanId) {
+      const planId = parseInt(savedPlanId, 10);
+      const savedPlan = MOCK_PLANS.find((p) => p.id === planId);
+      if (savedPlan) {
+        setCurrentPlan(savedPlan);
+        return;
+      }
+    }
+  }, []);
+
+  // 컴포넌트 마운트 시 및 페이지 포커스 시 localStorage 확인
+  useEffect(() => {
+    loadCurrentPlan();
+
+    const handleFocus = () => {
+      loadCurrentPlan();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [loadCurrentPlan]);
 
   // 필터링 및 정렬 로직
   const filteredAndSortedPlans = useMemo(() => {
@@ -325,7 +455,31 @@ export default function Plan() {
   }, [selectedNetwork, selectedOttList, sortTarget, sortOrder]);
 
   const handlePlanClick = (plan: PlanType) => {
-    navigate(PAGE_PATHS.PLAN_DETAIL.replace(':id', plan.id.toString()));
+    if (isCompareMode) {
+      // 비교 모드: 카드 선택/해제
+      if (comparePlans.includes(plan.id)) {
+        setComparePlans(comparePlans.filter((id) => id !== plan.id));
+      } else if (comparePlans.length < 2) {
+        setComparePlans([...comparePlans, plan.id]);
+      }
+    } else {
+      // 일반 모드: 상세보기로 이동
+      setSelectedPlanId(plan.id);
+      navigate(PAGE_PATHS.PLAN_DETAIL.replace(':id', plan.id.toString()));
+    }
+  };
+
+  const handleCompareClick = () => {
+    if (comparePlans.length === 2) {
+      navigate(PAGE_PATHS.PLAN_COMPARE, {
+        state: { plan1Id: comparePlans[0], plan2Id: comparePlans[1] },
+      });
+    }
+  };
+
+  const handleCancelCompare = () => {
+    setIsCompareMode(false);
+    setComparePlans([]);
   };
 
   return (
@@ -350,6 +504,35 @@ export default function Plan() {
               size="lg"
               floatSpeed={1.8}
               rotation={0.3}
+            />
+          </div>
+
+          {/* 비교하기 버튼 */}
+          <button
+            type="button"
+            className={`${styles.compareButton} ${isCompareMode ? styles.compareButtonActive : ''}`}
+            onClick={() => setIsCompareMode(!isCompareMode)}
+          >
+            요금제 한눈에 비교하기!! click!!
+          </button>
+
+          {/* 현재 사용 중인 요금제 */}
+          <div
+            style={{
+              marginBottom: '24px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <h2 className={styles.currentPlanTitle}>현재 사용중인 요금제</h2>
+            <CurrentPlanCard
+              plan={currentPlan}
+              isSelected={selectedPlanId === currentPlan.id}
+              isCompareMode={isCompareMode}
+              isCompareSelected={comparePlans.includes(currentPlan.id)}
+              onClick={handlePlanClick}
             />
           </div>
 
@@ -394,6 +577,9 @@ export default function Plan() {
                   <PlanCard
                     key={plan.id}
                     plan={plan}
+                    isSelected={selectedPlanId === plan.id}
+                    isCompareMode={isCompareMode}
+                    isCompareSelected={comparePlans.includes(plan.id)}
                     onClick={handlePlanClick}
                   />
                 ))}
@@ -403,6 +589,27 @@ export default function Plan() {
           {!isLoading && filteredAndSortedPlans.length === 0 && (
             <div className={styles.emptyState}>
               조건에 맞는 요금제가 없습니다.
+            </div>
+          )}
+
+          {/* 비교 모드 하단 버튼 */}
+          {isCompareMode && (
+            <div className={styles.compareActions}>
+              <button
+                type="button"
+                className={styles.compareConfirmButton}
+                onClick={handleCompareClick}
+                disabled={comparePlans.length !== 2}
+              >
+                비교하기 ({comparePlans.length}/2)
+              </button>
+              <button
+                type="button"
+                className={styles.compareCancelButton}
+                onClick={handleCancelCompare}
+              >
+                취소
+              </button>
             </div>
           )}
         </div>

@@ -39,13 +39,60 @@ export const title = style({
   margin: 0,
 });
 
-export const card = style({
+export const cardContainer = style({
   width: '100%',
   maxWidth: '480px',
+  height: '600px',
+  perspective: '1000px',
+  cursor: 'pointer',
+  marginBottom: '24px',
+  position: 'relative',
+  border: 'none',
+  background: 'transparent',
+  padding: 0,
+});
+
+export const card = style({
+  width: '100%',
+  height: '100%',
   backgroundColor: '#fff',
   borderRadius: '16px',
   padding: '24px',
   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  backfaceVisibility: 'hidden',
+  transformStyle: 'preserve-3d',
+  transition: 'transform 0.6s',
+});
+
+export const cardBack = style({
+  width: '100%',
+  height: '100%',
+  backgroundColor: '#fff',
+  borderRadius: '16px',
+  padding: '24px',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  backfaceVisibility: 'hidden',
+  transformStyle: 'preserve-3d',
+  transition: 'transform 0.6s',
+});
+
+export const chartContainer = style({
+  width: '100%',
+  height: '400px',
+  marginTop: '24px',
+});
+
+export const flipHint = style({
+  textAlign: 'center',
+  fontSize: '14px',
+  color: '#6b7280',
+  marginTop: '16px',
 });
 
 export const cardHeader = style({
@@ -65,7 +112,7 @@ export const provider = style({
 export const price = style({
   fontSize: '20px',
   fontWeight: '700',
-  color: '#db2777',
+  color: '#E91685',
 });
 
 export const planName = style({
@@ -111,22 +158,23 @@ export const badge = style({
 
 export const ottList = style({
   display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: '4px',
+  fontSize: '18px',
+  fontWeight: '600',
+  color: '#111827',
 });
 
 export const ottItem = style({
-  padding: '12px',
-  backgroundColor: '#f3f4f6',
-  borderRadius: '8px',
-  fontSize: '14px',
-  color: '#111827',
+  display: 'inline',
 });
 
 export const applyButton = style({
   width: '100%',
+  maxWidth: '480px',
   padding: '16px',
-  backgroundColor: '#db2777',
+  backgroundColor: '#E91685',
   color: '#fff',
   border: 'none',
   borderRadius: '12px',
@@ -136,7 +184,7 @@ export const applyButton = style({
   marginTop: '24px',
   transition: 'background-color 0.2s',
   ':hover': {
-    backgroundColor: '#be185d',
+    backgroundColor: '#d11473',
   },
 });
 

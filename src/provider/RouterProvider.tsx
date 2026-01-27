@@ -19,6 +19,7 @@ import Signup from '../pages/Login/Signup';
 import Tips from '../pages/MyPage/pages/Tips';
 import PersonalityTest from '../pages/PersonalityTest/PersonalityTest';
 import Plan from '../pages/Plan/Plan';
+import PlanCompare from '../pages/Plan/PlanCompare';
 import PlanDetail from '../pages/Plan/PlanDetail';
 import Subscribe from '../pages/Subscribe/Subscribe';
 import SubscribeDetail from '../pages/Subscribe/SubscribeDetail';
@@ -100,6 +101,10 @@ export default function RouterProvider() {
     {
       path: PAGE_PATHS.PLAN_DETAIL,
       Component: PlanDetail,
+    },
+    {
+      path: PAGE_PATHS.PLAN_COMPARE,
+      Component: PlanCompare,
     },
     {
       path: PAGE_PATHS.SUBSCRIBE,

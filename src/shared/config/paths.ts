@@ -7,6 +7,7 @@ export const PAGE_PATHS = {
   ADMIN: '/admin',
   PLAN: '/plan',
   PLAN_DETAIL: '/plan/:id',
+  PLAN_COMPARE: '/plan/compare',
   SUBSCRIBE: '/subscribe',
   SUBSCRIBE_DETAIL: '/subscribe/:id',
   PERSONALITY_TEST: '/personality-test',
