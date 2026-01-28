@@ -153,6 +153,7 @@ export const menuItem = style({
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '14px 12px',
+  cursor: 'pointer',
 });
 
 export const menuLeft = style({
@@ -162,7 +163,19 @@ export const menuLeft = style({
 });
 
 export const icon = style({
-  fontSize: '16px',
+  width: '30px',
+  height: '30px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  lineHeight: 1,
+});
+
+export const iconImg = style({
+  maxWidth: '24px',
+  maxHeight: '24px',
+  objectFit: 'contain',
+  display: 'block',
 });
 
 /********************
