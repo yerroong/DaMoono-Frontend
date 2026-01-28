@@ -163,7 +163,11 @@ export default function Home() {
             <button
               type="button"
               className={styles.moreButton}
-              onClick={() => navigate(PAGE_PATHS.PLAN)}
+              onClick={() =>
+                navigate(
+                  activeTab === 'plan' ? PAGE_PATHS.PLAN : PAGE_PATHS.SUBSCRIBE,
+                )
+              }
             >
               더보기 &gt;
             </button>
