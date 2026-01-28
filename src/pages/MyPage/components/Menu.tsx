@@ -46,7 +46,7 @@ const MENU_MAP: Record<MenuType, MenuItem[]> = {
     {
       label: '성향 테스트 하러가기',
       icon: testIcon,
-      path: '/personality-test',
+      path: '/service-recommendation',
       state: { compare: false },
     },
   ],
