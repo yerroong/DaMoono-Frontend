@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 import BottomNav from '@/components/BottomNav';
 import Guide from '@/components/Guide';
 import Header from '@/components/Header';
+import LoginRequiredModal from '@/components/modal/LoginRequiredModal';
 import { MOCK_PLANS } from '@/pages/Plan/constants';
 import { MOCK_SUBSCRIBES } from '@/pages/Subscribe/constants';
 import { PAGE_PATHS } from '@/shared/config/paths';
@@ -15,6 +16,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showGuide, setShowGuide] = useState(false);
   const [activeTab, setActiveTab] = useState<'plan' | 'subscribe'>('plan');
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // 랜덤으로 5개 선택하는 함수
   const getRandomItems = <T,>(array: T[], count: number): T[] => {
@@ -82,6 +84,15 @@ export default function Home() {
     setShowGuide(false);
   };
 
+  const handleChatClick = () => {
+    const userName = localStorage.getItem('userName');
+    if (!userName) {
+      setShowLoginModal(true);
+    } else {
+      navigate('/chat');
+    }
+  };
+
   return (
     <Layout>
       <Header />
@@ -99,7 +110,7 @@ export default function Home() {
         <button
           type="button"
           className={styles.chatButton}
-          onClick={() => navigate('/chat')}
+          onClick={handleChatClick}
         >
           <span className={styles.chatText}>무너에게 다 무너봐~</span>
           <span className={styles.chatBadge}>채팅하기</span>
@@ -230,6 +241,8 @@ export default function Home() {
       {showGuide && (
         <Guide steps={guideSteps} onComplete={handleGuideComplete} />
       )}
+
+      {showLoginModal && <LoginRequiredModal />}
     </Layout>
   );
 }
