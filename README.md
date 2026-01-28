@@ -121,7 +121,8 @@ LangChain + OpenAI API
 ## 👥 팀원 및 역할
 | 프로필 | 이름 | 주요 역할 및 기여 |
 | --- | --- | --- |
-| ![profile]() | **김예린**<br/>[@yerroong](https://github.com/yerroong) | **Frontend · AI**<br/>팀장으로, OpenAI + LangChain 기반 텍스트·음성 AI 챗봇 프론트·백엔드 연동 구현, 요금제·구독 상품 응답 로직 설계, Socket.IO 기반 실시간 상담 채팅 통신 구현, 상담사 채팅 UI 개발, 챗봇 대화 흐름·프롬프트 설계 및 챗봇 매뉴얼 제작 |
+| <img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/1402d72e-21bf-4ce8-98a2-56a6dfba2aed" />
+ | **김예린**<br/>[@yerroong](https://github.com/yerroong) | **Frontend · AI**<br/>팀장으로, OpenAI + LangChain 기반 텍스트·음성 AI 챗봇 프론트·백엔드 연동 구현, 요금제·구독 상품 응답 로직 설계, Socket.IO 기반 실시간 상담 채팅 통신 구현, 상담사 채팅 UI 개발, 챗봇 대화 흐름·프롬프트 설계 및 챗봇 매뉴얼 제작 |
 | ![profile]() | **류종현**<br/>[@jonghyunRyu](https://github.com/jonghyunRyu) | **Frontend**<br/>마이페이지 및 관리자 페이지 UI 구현, 상담 이력·이용 데이터 시각화, 요금제·구독 정보 조회 UI 개발, 다중 데이터 로딩 렌더링 최적화 및 3D 로딩 UI 적용 |
 | ![profile]() | **양해강**<br/>[@Inoansta](https://github.com/Inoansta) | **Backend · AI**<br/>백엔드 프로젝트 및 DB 초기 셋업, 회원가입·인증 API 구현, REST API 설계, 프론트엔드 연동 및 서비스 배포 환경 구성, AI 기능 연동을 위한 서버 구조 설계 |
 | ![profile]() | **이해니**<br/>[@haeni82](https://github.com/haeni82) | **Frontend**<br/>상담 요약 페이지(UI) 구현, 유저용 상담 요약 프롬프트(JSON) 설계, 상담사 WebSocket 양방향 통신 구조 설계, 상담 요약 및 후속 액션 제안 기능 기획 |
