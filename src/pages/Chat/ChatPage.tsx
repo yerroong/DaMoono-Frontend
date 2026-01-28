@@ -71,7 +71,6 @@ export default function ChatPage() {
       content,
       timestamp: new Date(),
     };
-
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
@@ -84,14 +83,17 @@ export default function ChatPage() {
       timestamp: new Date(),
       type: 'text',
     };
-
     setMessages((prev) => [...prev, tempAssistantMessage]);
 
     try {
       const apiUrl =
         import.meta.env.VITE_API_URL ||
         import.meta.env.VITE_API_BASE_URL ||
-        'http://localhost:3000';
+        'https://damoono-backend.onrender.com';
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
+
       const response = await fetch(`${apiUrl}/api/chat`, {
         method: 'POST',
         headers: {
@@ -99,12 +101,19 @@ export default function ChatPage() {
         },
         body: JSON.stringify({
           message: content,
-          history: messages.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
+          history: messages
+            .filter(
+              (m) => m.role === 'user' || (m.role === 'assistant' && m.content),
+            )
+            .map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -133,17 +142,28 @@ export default function ChatPage() {
           ),
         );
 
-        // 단어 사이 딜레이 (자연스러운 타이핑 효과)
         await new Promise((resolve) => setTimeout(resolve, 30));
       }
-    } catch (_error) {
+    } catch (error) {
+      let errorMessage =
+        '죄송합니다. 서버와의 연결에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage =
+            '응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage =
+            '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        }
+      }
+
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === tempAssistantId
             ? {
                 ...msg,
-                content:
-                  '죄송합니다. 서버와의 연결에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+                content: errorMessage,
                 type: 'text',
               }
             : msg,

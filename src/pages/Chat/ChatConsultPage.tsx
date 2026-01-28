@@ -41,14 +41,12 @@ export default function ChatConsultPage() {
     // 세션 생성
     socketService.onSessionCreated((id) => {
       setSessionId(id);
-      console.log('📞 상담 세션 생성됨:', id);
     });
 
     // 상담사 연결
     socketService.onConsultantConnected(() => {
       setIsConnected(true);
-      setModalType(null); // 연결되면 모달 닫기
-      console.log('👨‍💼 상담사 연결됨');
+      setModalType(null);
     });
 
     // 메시지 수신

@@ -147,9 +147,7 @@ export default function ChatAdminPage() {
         localStorage.removeItem('userName');
         localStorage.removeItem('userRole');
         navigate('/');
-      } catch (error) {
-        console.error('로그아웃 실패:', error);
-        // 에러가 발생해도 로컬 스토리지는 정리하고 홈으로 이동
+      } catch {
         localStorage.removeItem('userName');
         localStorage.removeItem('userRole');
         navigate('/');
