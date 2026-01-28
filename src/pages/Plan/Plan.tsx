@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 import planHeaderCharacter from '@/assets/images/plan-header-character.png';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
+import { getPlans } from '@/services/planApi';
 import { PAGE_PATHS } from '@/shared/config/paths';
 import Layout from '../layout/Layout';
 import { MOCK_PLANS, OTT_IMAGES, OTT_LABELS, SORT_LABELS } from './constants';
@@ -72,7 +73,7 @@ function CurrentPlanCard({
         </span>
       </div>
 
-      {subscriptionServices.length > 0 && (
+      {subscriptionServices && subscriptionServices.length > 0 && (
         <div className={styles.ottContainer}>
           {subscriptionServices.map((service, index) => (
             <div
@@ -102,8 +103,8 @@ function CurrentPlanCard({
 interface SortFilterPanelProps {
   selectedNetwork: NetworkType | null;
   setSelectedNetwork: (network: NetworkType | null) => void;
-  sortOrder: 'asc' | 'desc';
-  setSortOrder: (order: 'asc' | 'desc') => void;
+  sortOrder: 'asc' | 'desc' | null;
+  setSortOrder: (order: 'asc' | 'desc' | null) => void;
   sortTarget: SortTarget | null;
   setSortTarget: (target: SortTarget | null) => void;
   selectedOttList: OTTType[];
@@ -170,7 +171,11 @@ function SortFilterPanel({
             }}
             className={styles.selectBase}
           >
-            {sortOrder === 'asc' ? '낮은 순' : '높은 순'}
+            {sortOrder === null
+              ? '기본'
+              : sortOrder === 'asc'
+                ? '낮은 순'
+                : '높은 순'}
           </button>
           <svg
             className={styles.selectIcon}
@@ -189,6 +194,32 @@ function SortFilterPanel({
           </svg>
           {showSortOrderMenu && (
             <div ref={sortOrderMenuRef} className={styles.sortMenu}>
+              <button
+                className={`${styles.sortMenuItem} ${sortOrder === null ? styles.sortMenuItemSelected : ''}`}
+                onClick={() => {
+                  setSortOrder(null);
+                  setShowSortOrderMenu(false);
+                }}
+              >
+                <span>기본</span>
+                {sortOrder === null && (
+                  <svg
+                    className={styles.checkIcon}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-label="선택됨"
+                    role="img"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )}
+              </button>
               <button
                 className={`${styles.sortMenuItem} ${sortOrder === 'asc' ? styles.sortMenuItemSelected : ''}`}
                 onClick={() => {
@@ -447,7 +478,7 @@ function PlanCard({
         </span>
       </div>
 
-      {subscriptionServices.length > 0 && (
+      {subscriptionServices && subscriptionServices.length > 0 && (
         <div className={styles.ottContainer}>
           {subscriptionServices.map((service, index) => (
             <div
@@ -478,7 +509,7 @@ export default function Plan() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sortTarget, setSortTarget] = useState<SortTarget | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkType | null>(
     null,
   );
@@ -488,25 +519,85 @@ export default function Plan() {
   const [comparePlans, setComparePlans] = useState<number[]>([]);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const [currentPlan, setCurrentPlan] = useState<PlanType>(() => {
-    const savedPlanId = localStorage.getItem('currentPlanId');
-    if (savedPlanId) {
-      const planId = parseInt(savedPlanId, 10);
-      const savedPlan = MOCK_PLANS.find((p) => p.id === planId);
-      if (savedPlan) return savedPlan;
-    }
-    return MOCK_PLANS[Math.floor(Math.random() * MOCK_PLANS.length)];
-  });
+  // API 데이터 상태
+  const [plans, setPlans] = useState<PlanType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [currentPlan, setCurrentPlan] = useState<PlanType | null>(null);
   const [isUpdatingPlan, setIsUpdatingPlan] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // API에서 요금제 목록 가져오기
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const fetchedPlans = await getPlans();
+        // 랜덤으로 섞기
+        const shuffledPlans = [...fetchedPlans].sort(() => Math.random() - 0.5);
+        setPlans(shuffledPlans);
+
+        // 현재 요금제 설정
+        const savedPlanId = localStorage.getItem('currentPlanId');
+        if (savedPlanId && fetchedPlans.length > 0) {
+          const planId = parseInt(savedPlanId, 10);
+          const savedPlan = fetchedPlans.find((p) => p.id === planId);
+          if (savedPlan) {
+            setCurrentPlan(savedPlan);
+          } else {
+            // 저장된 요금제가 없으면 랜덤 선택
+            setCurrentPlan(
+              fetchedPlans[Math.floor(Math.random() * fetchedPlans.length)],
+            );
+          }
+        } else if (fetchedPlans.length > 0) {
+          // 저장된 요금제가 없으면 랜덤 선택
+          setCurrentPlan(
+            fetchedPlans[Math.floor(Math.random() * fetchedPlans.length)],
+          );
+        }
+      } catch (err) {
+        console.error('요금제 목록을 가져오는 중 오류 발생:', err);
+        setError('요금제 목록을 불러오는데 실패했습니다.');
+        // 에러 발생 시 목데이터 사용 (랜덤으로 섞기)
+        const shuffledMockPlans = [...MOCK_PLANS].sort(
+          () => Math.random() - 0.5,
+        );
+        setPlans(shuffledMockPlans);
+        const savedPlanId = localStorage.getItem('currentPlanId');
+        if (savedPlanId) {
+          const planId = parseInt(savedPlanId, 10);
+          const savedPlan = MOCK_PLANS.find((p) => p.id === planId);
+          if (savedPlan) {
+            setCurrentPlan(savedPlan);
+          } else {
+            setCurrentPlan(
+              MOCK_PLANS[Math.floor(Math.random() * MOCK_PLANS.length)],
+            );
+          }
+        } else {
+          setCurrentPlan(
+            MOCK_PLANS[Math.floor(Math.random() * MOCK_PLANS.length)],
+          );
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
 
   const loadCurrentPlan = useCallback(() => {
     const savedPlanId = localStorage.getItem('currentPlanId');
-    if (savedPlanId) {
+    if (savedPlanId && plans.length > 0) {
       const planId = parseInt(savedPlanId, 10);
-      const savedPlan = MOCK_PLANS.find((p) => p.id === planId);
+      const savedPlan = plans.find((p) => p.id === planId);
       if (savedPlan) setCurrentPlan(savedPlan);
     }
-  }, []);
+  }, [plans]);
 
   useEffect(() => {
     loadCurrentPlan();
@@ -514,36 +605,40 @@ export default function Plan() {
     return () => window.removeEventListener('focus', loadCurrentPlan);
   }, [loadCurrentPlan]);
 
-  // 요금제 변경 신호 감지
+  // 성공 모달 표시 신호 감지
   useEffect(() => {
-    const planUpdated = (location.state as { planUpdated?: boolean })
-      ?.planUpdated;
-    if (planUpdated) {
-      setIsUpdatingPlan(true);
-      loadCurrentPlan();
-
-      // 700ms 후 효과 제거 (애니메이션 완료 후 클래스 제거)
-      const timer = setTimeout(() => {
-        setIsUpdatingPlan(false);
-      }, 700);
-
+    const showSuccess = (location.state as { showSuccessModal?: boolean })
+      ?.showSuccessModal;
+    if (showSuccess) {
+      setShowSuccessModal(true);
       // location state 초기화
       navigate(location.pathname, { replace: true, state: {} });
-
-      return () => clearTimeout(timer);
     }
-  }, [location.state, loadCurrentPlan, navigate, location.pathname]);
+  }, [location.state, navigate, location.pathname]);
+
+  // 성공 모달 확인 버튼 클릭 시 애니메이션 시작
+  const handleSuccessModalConfirm = useCallback(() => {
+    setShowSuccessModal(false);
+    setIsUpdatingPlan(true);
+    loadCurrentPlan();
+
+    // 700ms 후 효과 제거 (애니메이션 완료 후 클래스 제거)
+    setTimeout(() => {
+      setIsUpdatingPlan(false);
+    }, 700);
+  }, [loadCurrentPlan]);
 
   const filteredAndSortedPlans = useMemo(() => {
-    let filtered = [...MOCK_PLANS];
+    if (plans.length === 0) return [];
+    let filtered = [...plans];
     if (selectedNetwork)
       filtered = filtered.filter((p) => p.networkType === selectedNetwork);
     if (selectedOttList.length > 0) {
       filtered = filtered.filter((p) =>
-        selectedOttList.some((ott) => p.subscriptionServices.includes(ott)),
+        selectedOttList.some((ott) => p.subscriptionServices?.includes(ott)),
       );
     }
-    if (sortTarget) {
+    if (sortTarget && sortOrder !== null) {
       filtered.sort((a, b) => {
         const aVal = a[sortTarget] ?? 0;
         const bVal = b[sortTarget] ?? 0;
@@ -553,7 +648,7 @@ export default function Plan() {
       });
     }
     return filtered;
-  }, [selectedNetwork, selectedOttList, sortTarget, sortOrder]);
+  }, [plans, selectedNetwork, selectedOttList, sortTarget, sortOrder]);
 
   const handlePlanClick = (plan: PlanType) => {
     if (isCompareMode) {
@@ -605,38 +700,58 @@ export default function Plan() {
             <h2 className={styles.currentPlanTitle}>
               현재 사용중인 요금제 서비스
             </h2>
-            <CurrentPlanCard
-              plan={currentPlan}
-              isSelected={selectedPlanId === currentPlan.id}
-              isCompareMode={isCompareMode}
-              isCompareSelected={comparePlans.includes(currentPlan.id)}
-              isUpdating={isUpdatingPlan}
-              onClick={handlePlanClick}
-            />
-          </div>
-          <h2 className={styles.allPlansTitle}>요금제 전체보기</h2>
-          <SortFilterPanel
-            selectedNetwork={selectedNetwork}
-            setSelectedNetwork={setSelectedNetwork}
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
-            sortTarget={sortTarget}
-            setSortTarget={setSortTarget}
-            selectedOttList={selectedOttList}
-            setSelectedOttList={setSelectedOttList}
-          />
-          <div className={styles.planList}>
-            {filteredAndSortedPlans.map((plan) => (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                isSelected={selectedPlanId === plan.id}
+            {currentPlan ? (
+              <CurrentPlanCard
+                plan={currentPlan}
+                isSelected={selectedPlanId === currentPlan.id}
                 isCompareMode={isCompareMode}
-                isCompareSelected={comparePlans.includes(plan.id)}
+                isCompareSelected={comparePlans.includes(currentPlan.id)}
+                isUpdating={isUpdatingPlan}
                 onClick={handlePlanClick}
               />
-            ))}
+            ) : (
+              <div className={styles.loadingMessage}>로딩 중...</div>
+            )}
           </div>
+          <h2 className={styles.allPlansTitle}>요금제 전체보기</h2>
+          {isLoading ? (
+            <div className={styles.loadingMessage}>
+              요금제 목록을 불러오는 중...
+            </div>
+          ) : error ? (
+            <div className={styles.errorMessage}>{error}</div>
+          ) : (
+            <>
+              <SortFilterPanel
+                selectedNetwork={selectedNetwork}
+                setSelectedNetwork={setSelectedNetwork}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+                sortTarget={sortTarget}
+                setSortTarget={setSortTarget}
+                selectedOttList={selectedOttList}
+                setSelectedOttList={setSelectedOttList}
+              />
+              <div className={styles.planList}>
+                {filteredAndSortedPlans.length === 0 ? (
+                  <div className={styles.emptyState}>
+                    조건에 맞는 요금제가 없습니다.
+                  </div>
+                ) : (
+                  filteredAndSortedPlans.map((plan) => (
+                    <PlanCard
+                      key={plan.id}
+                      plan={plan}
+                      isSelected={selectedPlanId === plan.id}
+                      isCompareMode={isCompareMode}
+                      isCompareSelected={comparePlans.includes(plan.id)}
+                      onClick={handlePlanClick}
+                    />
+                  ))
+                )}
+              </div>
+            </>
+          )}
           {isCompareMode && (
             <div className={styles.compareActions}>
               <button
@@ -659,7 +774,43 @@ export default function Plan() {
           )}
         </div>
       </div>
-      <BottomNav />
+
+      {/* 성공 알림 모달 */}
+      {showSuccessModal && (
+        <button
+          type="button"
+          className={styles.successModalOverlay}
+          onClick={handleSuccessModalConfirm}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' || e.key === 'Enter') {
+              handleSuccessModalConfirm();
+            }
+          }}
+          aria-label="모달 닫기"
+        >
+          <div
+            className={styles.successModalContent}
+            role="dialog"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <h3 className={styles.successModalTitle}>
+              요금제 신청 및 변경이 완료되었습니다.
+            </h3>
+            <div className={styles.successModalButtons}>
+              <button
+                type="button"
+                className={styles.successModalConfirmButton}
+                onClick={handleSuccessModalConfirm}
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </button>
+      )}
+
+      {!showSuccessModal && <BottomNav />}
     </Layout>
   );
 }

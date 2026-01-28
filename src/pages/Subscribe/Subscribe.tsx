@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import subscribeHeaderCharacter from '@/assets/images/subscribe-header-character.png';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
+import { getSubscribes } from '@/services/subscribeApi';
 import Layout from '../layout/Layout';
 import {
   CATEGORY_LABELS,
@@ -28,15 +29,16 @@ function CurrentSubscribeCard({
   subscribe,
   isSelected,
   onClick,
-}: CurrentSubscribeCardProps) {
-  const { name, monthlyPrice, category, badges } = subscribe;
+  isUpdating,
+}: CurrentSubscribeCardProps & { isUpdating?: boolean }) {
+  const { name, monthlyPrice, category, description } = subscribe;
   const subscribeImage = SUBSCRIBE_IMAGES[name] || null;
 
   return (
     <button
       type="button"
       onClick={() => onClick?.(subscribe)}
-      className={`${styles.currentSubscribeCard} ${isSelected ? styles.subscribeCardSelected : ''}`}
+      className={`${styles.currentSubscribeCard} ${isSelected ? styles.subscribeCardSelected : ''} ${isUpdating ? styles.currentSubscribeCardUpdating : ''}`}
     >
       <div className={styles.cardHeader}>
         <span className={styles.category}>{CATEGORY_LABELS[category]}</span>
@@ -48,22 +50,9 @@ function CurrentSubscribeCard({
         {name}
       </div>
 
-      {/* 배지 */}
-      <div className={styles.badgeContainer}>
-        {badges.length > 0 ? (
-          badges.map((badge) => (
-            <span
-              key={badge}
-              className={`${styles.badge} ${styles.badgeHighlight}`}
-            >
-              {badge}
-            </span>
-          ))
-        ) : (
-          <span className={`${styles.badge} ${styles.badgeCategory}`}>
-            {CATEGORY_LABELS[category]}
-          </span>
-        )}
+      {/* 서비스 소개 */}
+      <div className={styles.descriptionContainer}>
+        <p className={styles.descriptionText}>{description}</p>
       </div>
 
       {/* 구독 서비스 원형 아이콘 */}
@@ -364,7 +353,7 @@ interface SubscribeCardProps {
 }
 
 function SubscribeCard({ subscribe, onClick }: SubscribeCardProps) {
-  const { name, monthlyPrice, category, badges } = subscribe;
+  const { name, monthlyPrice, category, description } = subscribe;
   const subscribeImage = SUBSCRIBE_IMAGES[name] || null;
 
   return (
@@ -383,22 +372,9 @@ function SubscribeCard({ subscribe, onClick }: SubscribeCardProps) {
         {name}
       </div>
 
-      {/* 배지 */}
-      <div className={styles.badgeContainer}>
-        {badges.length > 0 ? (
-          badges.map((badge) => (
-            <span
-              key={badge}
-              className={`${styles.badge} ${styles.badgeHighlight}`}
-            >
-              {badge}
-            </span>
-          ))
-        ) : (
-          <span className={`${styles.badge} ${styles.badgeCategory}`}>
-            {CATEGORY_LABELS[category]}
-          </span>
-        )}
+      {/* 서비스 소개 */}
+      <div className={styles.descriptionContainer}>
+        <p className={styles.descriptionText}>{description}</p>
       </div>
 
       {/* 구독 서비스 원형 아이콘 */}
@@ -422,48 +398,107 @@ function SubscribeCard({ subscribe, onClick }: SubscribeCardProps) {
 // 메인 페이지 컴포넌트
 export default function Subscribe() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [sortTarget, setSortTarget] = useState<SortTarget | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selectedCategories, setSelectedCategories] = useState<CategoryType[]>(
     [],
   );
-  const [isLoading] = useState(false);
   const [selectedSubscribeId, setSelectedSubscribeId] = useState<number | null>(
     null,
   );
   const listRef = useRef<HTMLDivElement>(null);
 
+  // API 데이터 상태
+  const [subscribes, setSubscribes] = useState<SubscribeType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // 현재 사용 중인 구독 상태
-  const [currentSubscribe, setCurrentSubscribe] = useState<SubscribeType>(
-    () => {
-      const savedSubscribeId = localStorage.getItem('currentSubscribeId');
-      if (savedSubscribeId) {
-        const subscribeId = parseInt(savedSubscribeId, 10);
-        const savedSubscribe = MOCK_SUBSCRIBES.find(
-          (s) => s.id === subscribeId,
-        );
-        if (savedSubscribe) {
-          return savedSubscribe;
+  const [currentSubscribe, setCurrentSubscribe] =
+    useState<SubscribeType | null>(null);
+  const [isUpdatingSubscribe, setIsUpdatingSubscribe] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // API에서 구독 목록 가져오기
+  useEffect(() => {
+    const fetchSubscribes = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const fetchedSubscribes = await getSubscribes();
+        setSubscribes(fetchedSubscribes);
+
+        // 현재 구독 설정
+        const savedSubscribeId = localStorage.getItem('currentSubscribeId');
+        if (savedSubscribeId && fetchedSubscribes.length > 0) {
+          const subscribeId = parseInt(savedSubscribeId, 10);
+          const savedSubscribe = fetchedSubscribes.find(
+            (s) => s.id === subscribeId,
+          );
+          if (savedSubscribe) {
+            setCurrentSubscribe(savedSubscribe);
+          } else {
+            // 저장된 구독이 없으면 랜덤 선택
+            setCurrentSubscribe(
+              fetchedSubscribes[
+                Math.floor(Math.random() * fetchedSubscribes.length)
+              ],
+            );
+          }
+        } else if (fetchedSubscribes.length > 0) {
+          // 저장된 구독이 없으면 랜덤 선택
+          setCurrentSubscribe(
+            fetchedSubscribes[
+              Math.floor(Math.random() * fetchedSubscribes.length)
+            ],
+          );
         }
+      } catch (err) {
+        console.error('구독 목록을 가져오는 중 오류 발생:', err);
+        setError('구독 목록을 불러오는데 실패했습니다.');
+        // 에러 발생 시 목데이터 사용
+        setSubscribes(MOCK_SUBSCRIBES);
+        const savedSubscribeId = localStorage.getItem('currentSubscribeId');
+        if (savedSubscribeId) {
+          const subscribeId = parseInt(savedSubscribeId, 10);
+          const savedSubscribe = MOCK_SUBSCRIBES.find(
+            (s) => s.id === subscribeId,
+          );
+          if (savedSubscribe) {
+            setCurrentSubscribe(savedSubscribe);
+          } else {
+            setCurrentSubscribe(
+              MOCK_SUBSCRIBES[
+                Math.floor(Math.random() * MOCK_SUBSCRIBES.length)
+              ],
+            );
+          }
+        } else {
+          setCurrentSubscribe(
+            MOCK_SUBSCRIBES[Math.floor(Math.random() * MOCK_SUBSCRIBES.length)],
+          );
+        }
+      } finally {
+        setIsLoading(false);
       }
-      // 저장된 구독이 없으면 랜덤 선택
-      const randomIndex = Math.floor(Math.random() * MOCK_SUBSCRIBES.length);
-      return MOCK_SUBSCRIBES[randomIndex];
-    },
-  );
+    };
+
+    fetchSubscribes();
+  }, []);
 
   // localStorage에서 현재 사용중인 구독 가져오기
   const loadCurrentSubscribe = useCallback(() => {
     const savedSubscribeId = localStorage.getItem('currentSubscribeId');
-    if (savedSubscribeId) {
+    if (savedSubscribeId && subscribes.length > 0) {
       const subscribeId = parseInt(savedSubscribeId, 10);
-      const savedSubscribe = MOCK_SUBSCRIBES.find((s) => s.id === subscribeId);
+      const savedSubscribe = subscribes.find((s) => s.id === subscribeId);
       if (savedSubscribe) {
         setCurrentSubscribe(savedSubscribe);
         return;
       }
     }
-  }, []);
+  }, [subscribes]);
 
   // 컴포넌트 마운트 시 및 페이지 포커스 시 localStorage 확인
   useEffect(() => {
@@ -479,9 +514,33 @@ export default function Subscribe() {
     };
   }, [loadCurrentSubscribe]);
 
+  // 성공 모달 표시 신호 감지
+  useEffect(() => {
+    const showSuccess = (location.state as { showSuccessModal?: boolean })
+      ?.showSuccessModal;
+    if (showSuccess) {
+      setShowSuccessModal(true);
+      // location state 초기화
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate, location.pathname]);
+
+  // 성공 모달 확인 버튼 클릭 시 애니메이션 시작
+  const handleSuccessModalConfirm = useCallback(() => {
+    setShowSuccessModal(false);
+    setIsUpdatingSubscribe(true);
+    loadCurrentSubscribe();
+
+    // 700ms 후 효과 제거 (애니메이션 완료 후 클래스 제거)
+    setTimeout(() => {
+      setIsUpdatingSubscribe(false);
+    }, 700);
+  }, [loadCurrentSubscribe]);
+
   // 필터링 및 정렬 로직
   const filteredAndSortedSubscribes = useMemo(() => {
-    let filtered = [...MOCK_SUBSCRIBES];
+    if (subscribes.length === 0) return [];
+    let filtered = [...subscribes];
 
     // 카테고리 필터
     if (selectedCategories.length > 0) {
@@ -506,8 +565,8 @@ export default function Subscribe() {
             bValue = b.monthlyPrice;
             break;
           case 'benefits':
-            aValue = a.benefits.length;
-            bValue = b.benefits.length;
+            aValue = a.benefits?.length ?? 0;
+            bValue = b.benefits?.length ?? 0;
             break;
           default:
             return 0;
@@ -522,7 +581,7 @@ export default function Subscribe() {
     }
 
     return filtered;
-  }, [selectedCategories, sortTarget, sortOrder]);
+  }, [subscribes, selectedCategories, sortTarget, sortOrder]);
 
   const handleSubscribeClick = (subscribe: SubscribeType) => {
     setSelectedSubscribeId(subscribe.id);
@@ -557,70 +616,96 @@ export default function Subscribe() {
           {/* 현재 사용 중인 구독 */}
           <div className={styles.currentSubscribeSection}>
             <h2 className={styles.currentSubscribeTitle}>현재 사용중인 구독</h2>
-            <CurrentSubscribeCard
-              subscribe={currentSubscribe}
-              isSelected={selectedSubscribeId === currentSubscribe.id}
-              onClick={handleSubscribeClick}
-            />
+            {currentSubscribe ? (
+              <CurrentSubscribeCard
+                subscribe={currentSubscribe}
+                isSelected={selectedSubscribeId === currentSubscribe.id}
+                isUpdating={isUpdatingSubscribe}
+                onClick={handleSubscribeClick}
+              />
+            ) : (
+              <div className={styles.loadingMessage}>로딩 중...</div>
+            )}
           </div>
 
           {/* 정렬/필터 패널 */}
-          <SortFilterPanel
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
-            sortTarget={sortTarget}
-            setSortTarget={setSortTarget}
-            selectedCategories={selectedCategories}
-            setSelectedCategories={setSelectedCategories}
-          />
-
-          {/* 모든 구독 */}
-          <h2 className={styles.allSubscribesTitle}>모든 구독</h2>
-
-          {/* 구독 리스트 */}
-          <div className={styles.subscribeList}>
-            {isLoading
-              ? Array.from({ length: 4 }, (_, i) => i).map((i) => (
-                  <div key={`skeleton-${i}`} className={styles.skeleton}>
-                    <div
-                      style={{
-                        height: '16px',
-                        width: '80px',
-                        backgroundColor: '#d1d5db',
-                        borderRadius: '4px',
-                        marginBottom: '4px',
-                      }}
-                    />
-                    <div
-                      style={{
-                        height: '20px',
-                        width: '120px',
-                        backgroundColor: '#d1d5db',
-                        borderRadius: '4px',
-                        marginBottom: '8px',
-                      }}
-                    />
-                  </div>
-                ))
-              : filteredAndSortedSubscribes.map((subscribe) => (
-                  <SubscribeCard
-                    key={subscribe.id}
-                    subscribe={subscribe}
-                    onClick={handleSubscribeClick}
-                  />
-                ))}
-          </div>
-
-          {/* 결과 없음 */}
-          {!isLoading && filteredAndSortedSubscribes.length === 0 && (
-            <div className={styles.emptyState}>
-              조건에 맞는 구독 서비스가 없습니다.
+          {isLoading ? (
+            <div className={styles.loadingMessage}>
+              구독 목록을 불러오는 중...
             </div>
+          ) : error ? (
+            <div className={styles.errorMessage}>{error}</div>
+          ) : (
+            <>
+              <SortFilterPanel
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+                sortTarget={sortTarget}
+                setSortTarget={setSortTarget}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+              />
+
+              {/* 모든 구독 */}
+              <h2 className={styles.allSubscribesTitle}>모든 구독</h2>
+
+              {/* 구독 리스트 */}
+              <div className={styles.subscribeList}>
+                {filteredAndSortedSubscribes.length === 0 ? (
+                  <div className={styles.emptyState}>
+                    조건에 맞는 구독 서비스가 없습니다.
+                  </div>
+                ) : (
+                  filteredAndSortedSubscribes.map((subscribe) => (
+                    <SubscribeCard
+                      key={subscribe.id}
+                      subscribe={subscribe}
+                      onClick={handleSubscribeClick}
+                    />
+                  ))
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>
 
-      <BottomNav />
+      {/* 성공 알림 모달 */}
+      {showSuccessModal && (
+        <button
+          type="button"
+          className={styles.successModalOverlay}
+          onClick={handleSuccessModalConfirm}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' || e.key === 'Enter') {
+              handleSuccessModalConfirm();
+            }
+          }}
+          aria-label="모달 닫기"
+        >
+          <div
+            className={styles.successModalContent}
+            role="dialog"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <h3 className={styles.successModalTitle}>
+              구독 서비스 신청 및 변경이 완료되었습니다.
+            </h3>
+            <div className={styles.successModalButtons}>
+              <button
+                type="button"
+                className={styles.successModalConfirmButton}
+                onClick={handleSuccessModalConfirm}
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </button>
+      )}
+
+      {!showSuccessModal && <BottomNav />}
     </Layout>
   );
 }

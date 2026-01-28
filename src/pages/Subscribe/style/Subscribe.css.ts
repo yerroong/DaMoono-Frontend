@@ -1,4 +1,22 @@
-import { style } from '@vanilla-extract/css';
+import { keyframes, style } from '@vanilla-extract/css';
+
+const skeletonShimmer = keyframes({
+  '0%': {
+    transform: 'translateX(-100%)',
+    opacity: 0,
+  },
+  '10%': {
+    opacity: 1,
+  },
+  '90%': {
+    opacity: 1,
+  },
+  '100%': {
+    transform: 'translateX(100%)',
+    opacity: 0,
+    visibility: 'hidden',
+  },
+});
 
 export const container = style({
   padding: '20px 16px',
@@ -287,6 +305,23 @@ export const subscribeName = style({
   marginBottom: '8px',
 });
 
+export const descriptionContainer = style({
+  marginBottom: '16px',
+  marginTop: '8px',
+});
+
+export const descriptionText = style({
+  fontSize: '14px',
+  color: '#6b7280',
+  lineHeight: '1.5',
+  margin: 0,
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
 export const badgeContainer = style({
   marginTop: '8px',
   display: 'flex',
@@ -344,10 +379,83 @@ export const subscribeImage = style({
   objectFit: 'cover',
 });
 
+export const loadingMessage = style({
+  textAlign: 'center',
+  color: '#6b7280',
+  padding: '32px 0',
+  fontSize: '16px',
+});
+
+export const errorMessage = style({
+  textAlign: 'center',
+  color: '#ef4444',
+  padding: '32px 0',
+  fontSize: '16px',
+});
+
 export const emptyState = style({
   textAlign: 'center',
   color: '#6b7280',
   padding: '32px 0',
+});
+
+export const successModalOverlay = style({
+  border: 'none',
+  background: 'none',
+  padding: 0,
+  margin: 0,
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 2000, // BottomNav의 zIndex(1000)보다 높게 설정
+  outline: 'none',
+});
+
+export const successModalContent = style({
+  position: 'relative',
+  width: '380px',
+  padding: '24px',
+  borderRadius: '12px',
+  background: '#fff',
+  boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+  textAlign: 'center',
+});
+
+export const successModalTitle = style({
+  fontSize: '18px',
+  fontWeight: '700',
+  color: '#333',
+  margin: 0,
+  marginBottom: '24px',
+  textAlign: 'center',
+});
+
+export const successModalButtons = style({
+  display: 'flex',
+  gap: '12px',
+  marginTop: '24px',
+});
+
+export const successModalConfirmButton = style({
+  flex: 1,
+  padding: '12px',
+  backgroundColor: '#E91685',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  fontSize: '16px',
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s',
+  ':hover': {
+    backgroundColor: '#d11473',
+  },
 });
 
 export const skeleton = style({
@@ -378,6 +486,24 @@ export const allSubscribesTitle = style({
   marginTop: '24px',
   textAlign: 'left',
   width: '100%',
+});
+
+export const currentSubscribeCardUpdating = style({
+  position: 'relative',
+  overflow: 'hidden',
+  '::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '50%',
+    height: '100%',
+    background:
+      'linear-gradient(90deg, transparent, rgba(243, 244, 246, 0.6), transparent)',
+    animation: `${skeletonShimmer} 0.6s ease-in-out`,
+    pointerEvents: 'none',
+    zIndex: 1,
+  },
 });
 
 export const currentSubscribeCard = style({

@@ -159,3 +159,76 @@ export const errorMessage = style({
   color: '#6b7280',
   marginBottom: '24px',
 });
+
+export const modalOverlay = style({
+  border: 'none',
+  background: 'none',
+  padding: 0,
+  margin: 0,
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 2000, // BottomNav의 zIndex(1000)보다 높게 설정
+  outline: 'none',
+});
+
+export const modalContent = style({
+  backgroundColor: '#fff',
+  borderRadius: '16px',
+  padding: '24px',
+  width: '90%',
+  maxWidth: '320px',
+  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+});
+
+export const modalTitle = style({
+  fontSize: '18px',
+  fontWeight: '700',
+  color: '#333',
+  margin: 0,
+  marginBottom: '24px',
+  textAlign: 'center',
+});
+
+export const modalButtons = style({
+  display: 'flex',
+  gap: '12px',
+});
+
+export const modalCancelButton = style({
+  flex: 1,
+  padding: '12px',
+  backgroundColor: '#f3f4f6',
+  color: '#333',
+  border: 'none',
+  borderRadius: '8px',
+  fontSize: '16px',
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s',
+  ':hover': {
+    backgroundColor: '#e5e7eb',
+  },
+});
+
+export const modalConfirmButton = style({
+  flex: 1,
+  padding: '12px',
+  backgroundColor: '#E91685',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  fontSize: '16px',
+  fontWeight: '600',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s',
+  ':hover': {
+    backgroundColor: '#d11473',
+  },
+});

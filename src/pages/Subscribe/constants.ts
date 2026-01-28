@@ -1,3 +1,14 @@
+import appleMusicImg from '@/assets/images/apple-music.png';
+import coupangImg from '@/assets/images/coupang.png';
+import disneyPlusImg from '@/assets/images/disney-plus.png';
+import genieMusicImg from '@/assets/images/genie-music.png';
+import millieImg from '@/assets/images/millie.png';
+import netflixImg from '@/assets/images/netflix.png';
+import newsstandImg from '@/assets/images/newsstand.png';
+import spotifyImg from '@/assets/images/spotify.png';
+import tvingImg from '@/assets/images/tving.png';
+import youtubePremiumImg from '@/assets/images/youtube-premium.png';
+
 import type { CategoryType, SortTarget, Subscribe } from './types';
 
 export const SORT_LABELS: Record<SortTarget, string> = {
@@ -14,38 +25,50 @@ export const CATEGORY_LABELS: Record<CategoryType, string> = {
   SHOPPING: '쇼핑',
 };
 
-// 구독 서비스 이미지 매핑 (나중에 이미지 파일 추가 시 사용)
-// 예시:
-// import netflixImg from '@/assets/images/netflix.png';
-// import youtubeImg from '@/assets/images/youtube.png';
-// ...
-// export const SUBSCRIBE_IMAGES: Record<string, string | null> = {
-//   '넷플릭스 프리미엄': netflixImg,
-//   '유튜브 프리미엄': youtubeImg,
-//   ...
-// };
-
+// 구독 서비스 이미지 매핑
+// 구독 서비스 이름(백엔드에서 받은 name 필드)을 키로 사용합니다
 export const SUBSCRIBE_IMAGES: Record<string, string | null> = {
-  '넷플릭스 프리미엄': null,
-  '유튜브 프리미엄': null,
-  '디즈니+': null,
-  스포티파이: null,
-  '밀리의 서재': null,
-  뉴스스탠드: null,
-  쿠팡플레이: null,
-  '애플 뮤직': null,
-  '유튜브 프리미엄 + 추가혜택(택1)': null,
+  // 넷플릭스 관련
+  '넷플릭스 프리미엄': netflixImg,
+  '넷플릭스 월정액': netflixImg,
+
+  // 유튜브 프리미엄 관련
+  '유튜브 프리미엄': youtubePremiumImg,
+  '유튜브 프리미엄 + 추가혜택(택1)': youtubePremiumImg,
+  '유튜브 프리미엄 + 이모티콘플러스 구독팩': youtubePremiumImg,
+  '유튜브 프리미엄 + 배달의민족 구독팩': youtubePremiumImg,
+  '유튜브 프리미엄 + 스타벅스 구독팩': youtubePremiumImg,
+  '유튜브 프리미엄 + CGV 구독팩': youtubePremiumImg,
+
+  // 디즈니+ 관련
+  '디즈니+': disneyPlusImg,
+  '디즈니 + 추가혜택(택1)': disneyPlusImg,
+  '디즈니+월정액 이용권': disneyPlusImg,
+
+  // 티빙 관련
+  '티빙 월정액 이용권': tvingImg,
+
+  // 밀리의 서재
+  '밀리의 서재': millieImg,
+
+  // 뉴스스탠드
+  뉴스스탠드: newsstandImg,
+
+  // 지니뮤직 관련
+  '지니뮤직 마음껏듣기 월정액': genieMusicImg,
+  '지니뮤직 + 추가혜택(택1)': genieMusicImg,
+
+  // 쿠팡플레이
+  쿠팡플레이: coupangImg,
+
+  // 스포티파이
+  스포티파이: spotifyImg,
+
+  // 애플 뮤직
+  '애플 뮤직': appleMusicImg,
+
+  // 이미지가 없는 서비스들
   '더블 스트리밍 연간권': null,
-  '티빙 월정액 이용권': null,
-  '유튜브 프리미엄 + 이모티콘플러스 구독팩': null,
-  '넷플릭스 월정액': null,
-  '디즈니 + 추가혜택(택1)': null,
-  '디즈니+월정액 이용권': null,
-  '유튜브 프리미엄 + 배달의민족 구독팩': null,
-  '지니뮤직 마음껏듣기 월정액': null,
-  '지니뮤직 + 추가혜택(택1)': null,
-  '유튜브 프리미엄 + 스타벅스 구독팩': null,
-  '유튜브 프리미엄 + CGV 구독팩': null,
 };
 
 export const MOCK_SUBSCRIBES: Subscribe[] = [

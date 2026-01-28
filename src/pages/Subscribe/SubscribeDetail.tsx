@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
@@ -13,6 +14,7 @@ export default function SubscribeDetail() {
   const subscribe = subscribeId
     ? MOCK_SUBSCRIBES.find((s) => s.id === subscribeId)
     : null;
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   if (!subscribe) {
     return (
@@ -116,22 +118,66 @@ export default function SubscribeDetail() {
           <button
             type="button"
             className={styles.applyButton}
-            onClick={() => {
-              // localStorage에 현재 사용중인 구독 저장
-              localStorage.setItem(
-                'currentSubscribeId',
-                subscribe.id.toString(),
-              );
-              // Subscribe 페이지로 이동
-              navigate(PAGE_PATHS.SUBSCRIBE);
-            }}
+            onClick={() => setShowConfirmModal(true)}
           >
             이 구독 서비스 신청하기
           </button>
         </div>
+
+        {/* 확인 모달 */}
+        {showConfirmModal && (
+          <button
+            type="button"
+            className={styles.modalOverlay}
+            onClick={() => setShowConfirmModal(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setShowConfirmModal(false);
+              }
+            }}
+            aria-label="모달 닫기"
+          >
+            <div
+              className={styles.modalContent}
+              role="dialog"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
+              <h3 className={styles.modalTitle}>
+                이 구독 서비스로 신청하시겠습니까?
+              </h3>
+              <div className={styles.modalButtons}>
+                <button
+                  type="button"
+                  className={styles.modalConfirmButton}
+                  onClick={() => {
+                    // localStorage에 현재 사용중인 구독 저장
+                    localStorage.setItem(
+                      'currentSubscribeId',
+                      subscribe.id.toString(),
+                    );
+                    // Subscribe 페이지로 이동 (성공 모달 표시 신호 전달)
+                    navigate(PAGE_PATHS.SUBSCRIBE, {
+                      state: { showSuccessModal: true },
+                    });
+                  }}
+                >
+                  확인
+                </button>
+                <button
+                  type="button"
+                  className={styles.modalCancelButton}
+                  onClick={() => setShowConfirmModal(false)}
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          </button>
+        )}
       </div>
 
-      <BottomNav />
+      {!showConfirmModal && <BottomNav />}
     </Layout>
   );
 }

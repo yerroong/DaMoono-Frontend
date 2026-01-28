@@ -7,15 +7,17 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { useNavigate, useParams } from 'react-router';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
+import { getPlans } from '@/services/planApi';
 import { PAGE_PATHS } from '@/shared/config/paths';
 import Layout from '../layout/Layout';
 import { MOCK_PLANS, OTT_IMAGES, OTT_LABELS } from './constants';
 import * as styles from './style/PlanDetail.css';
+import type { Plan } from './types';
 
 ChartJS.register(
   CategoryScale,
@@ -30,13 +32,34 @@ export default function PlanDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const planId = id ? parseInt(id, 10) : null;
-  const plan = planId ? MOCK_PLANS.find((p) => p.id === planId) : null;
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const plan = planId ? plans.find((p) => p.id === planId) : null;
   const [isFlipped, setIsFlipped] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  // API에서 요금제 목록 가져오기
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedPlans = await getPlans();
+        setPlans(fetchedPlans);
+      } catch (err) {
+        console.error('요금제 목록을 가져오는 중 오류 발생:', err);
+        // 에러 발생 시 목데이터 사용
+        setPlans(MOCK_PLANS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
   // 차트 데이터 계산 (0-100 점수로 정규화)
   const chartData = useMemo(() => {
-    if (!plan) {
+    if (!plan || plans.length === 0) {
       return {
         labels: ['가격', '데이터', '음성통화', '문자', '속도'],
         datasets: [
@@ -53,19 +76,15 @@ export default function PlanDetail() {
       plan;
 
     // 최대값 계산
-    const maxPrice = Math.max(...MOCK_PLANS.map((p) => p.price));
+    const maxPrice = Math.max(...plans.map((p) => p.price));
     const maxData = Math.max(
-      ...MOCK_PLANS.map((p) =>
-        p.dataAmountMb === 0 ? 200000 : p.dataAmountMb,
-      ),
+      ...plans.map((p) => (p.dataAmountMb === 0 ? 200000 : p.dataAmountMb)),
     );
     const maxVoice = Math.max(
-      ...MOCK_PLANS.map((p) => (p.voiceMinutes === -1 ? 2000 : p.voiceMinutes)),
+      ...plans.map((p) => (p.voiceMinutes === -1 ? 2000 : p.voiceMinutes)),
     );
-    const maxSms = Math.max(...MOCK_PLANS.map((p) => p.smsIncluded));
-    const maxSpeed = Math.max(
-      ...MOCK_PLANS.map((p) => p.overageSpeedMbps ?? 0),
-    );
+    const maxSms = Math.max(...plans.map((p) => p.smsIncluded));
+    const maxSpeed = Math.max(...plans.map((p) => p.overageSpeedMbps ?? 0));
 
     // 점수 계산 (0-100)
     const priceScore =
@@ -89,7 +108,7 @@ export default function PlanDetail() {
         },
       ],
     };
-  }, [plan]);
+  }, [plan, plans]);
 
   const chartOptions = {
     indexAxis: 'y' as const,
@@ -108,6 +127,20 @@ export default function PlanDetail() {
       },
     },
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Header />
+        <div className={styles.container}>
+          <div className={styles.loadingMessage}>
+            요금제 정보를 불러오는 중...
+          </div>
+        </div>
+        <BottomNav />
+      </Layout>
+    );
+  }
 
   if (!plan) {
     return (
@@ -213,7 +246,7 @@ export default function PlanDetail() {
             </div>
 
             {/* OTT 서비스 부분*/}
-            {subscriptionServices.length > 0 && (
+            {subscriptionServices && subscriptionServices.length > 0 && (
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>OTT 혜택</div>
                 <div
@@ -312,8 +345,10 @@ export default function PlanDetail() {
                   onClick={() => {
                     // localStorage에 현재 사용중인 요금제 저장
                     localStorage.setItem('currentPlanId', plan.id.toString());
-                    // Plan 페이지로 이동 (변경 신호 전달)
-                    navigate(PAGE_PATHS.PLAN, { state: { planUpdated: true } });
+                    // Plan 페이지로 이동 (성공 모달 표시 신호 전달)
+                    navigate(PAGE_PATHS.PLAN, {
+                      state: { showSuccessModal: true },
+                    });
                   }}
                 >
                   확인
@@ -331,7 +366,7 @@ export default function PlanDetail() {
         )}
       </div>
 
-      <BottomNav />
+      {!showConfirmModal && <BottomNav />}
     </Layout>
   );
 }

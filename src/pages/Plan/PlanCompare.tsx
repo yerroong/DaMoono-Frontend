@@ -7,11 +7,12 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { useLocation, useNavigate } from 'react-router';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
+import { getPlans } from '@/services/planApi';
 import { PAGE_PATHS } from '@/shared/config/paths';
 import Layout from '../layout/Layout';
 import { MOCK_PLANS, OTT_LABELS } from './constants';
@@ -33,49 +34,66 @@ export default function PlanCompare() {
   const { plan1Id, plan2Id } =
     (location.state as { plan1Id?: number; plan2Id?: number }) || {};
 
-  const plan1 = plan1Id
-    ? (MOCK_PLANS.find((p) => p.id === plan1Id) ?? null)
-    : null;
-  const plan2 = plan2Id
-    ? (MOCK_PLANS.find((p) => p.id === plan2Id) ?? null)
-    : null;
+  const [plans, setPlans] = useState<PlanType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const plan1 = plan1Id ? (plans.find((p) => p.id === plan1Id) ?? null) : null;
+  const plan2 = plan2Id ? (plans.find((p) => p.id === plan2Id) ?? null) : null;
+
+  // API에서 요금제 목록 가져오기
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedPlans = await getPlans();
+        setPlans(fetchedPlans);
+      } catch (err) {
+        console.error('요금제 목록을 가져오는 중 오류 발생:', err);
+        // 에러 발생 시 목데이터 사용
+        setPlans(MOCK_PLANS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
 
   // 차트 데이터 계산 함수
-  const calculateChartData = useCallback((plan: PlanType | null) => {
-    if (!plan) return [0, 0, 0, 0, 0];
-    const maxPrice = Math.max(...MOCK_PLANS.map((p) => p.price));
-    const maxData = Math.max(
-      ...MOCK_PLANS.map((p) =>
-        p.dataAmountMb === 0 ? 200000 : p.dataAmountMb,
-      ),
-    );
-    const maxVoice = Math.max(
-      ...MOCK_PLANS.map((p) => (p.voiceMinutes === -1 ? 2000 : p.voiceMinutes)),
-    );
-    const maxSms = Math.max(...MOCK_PLANS.map((p) => p.smsIncluded));
-    const maxSpeed = Math.max(
-      ...MOCK_PLANS.map((p) => p.overageSpeedMbps ?? 0),
-    );
+  const calculateChartData = useCallback(
+    (plan: PlanType | null) => {
+      if (!plan || plans.length === 0) return [0, 0, 0, 0, 0];
+      const maxPrice = Math.max(...plans.map((p) => p.price));
+      const maxData = Math.max(
+        ...plans.map((p) => (p.dataAmountMb === 0 ? 200000 : p.dataAmountMb)),
+      );
+      const maxVoice = Math.max(
+        ...plans.map((p) => (p.voiceMinutes === -1 ? 2000 : p.voiceMinutes)),
+      );
+      const maxSms = Math.max(...plans.map((p) => p.smsIncluded));
+      const maxSpeed = Math.max(...plans.map((p) => p.overageSpeedMbps ?? 0));
 
-    const priceScore =
-      plan.price > 0
-        ? Math.round(((maxPrice - plan.price) / maxPrice) * 100)
+      const priceScore =
+        plan.price > 0
+          ? Math.round(((maxPrice - plan.price) / maxPrice) * 100)
+          : 0;
+      const dataScore =
+        plan.dataAmountMb === 0
+          ? 100
+          : Math.round((plan.dataAmountMb / maxData) * 100);
+      const voiceScore =
+        plan.voiceMinutes === -1
+          ? 100
+          : Math.round((plan.voiceMinutes / maxVoice) * 100);
+      const smsScore = Math.round((plan.smsIncluded / maxSms) * 100);
+      const speedScore = plan.overageSpeedMbps
+        ? Math.round((plan.overageSpeedMbps / maxSpeed) * 100)
         : 0;
-    const dataScore =
-      plan.dataAmountMb === 0
-        ? 100
-        : Math.round((plan.dataAmountMb / maxData) * 100);
-    const voiceScore =
-      plan.voiceMinutes === -1
-        ? 100
-        : Math.round((plan.voiceMinutes / maxVoice) * 100);
-    const smsScore = Math.round((plan.smsIncluded / maxSms) * 100);
-    const speedScore = plan.overageSpeedMbps
-      ? Math.round((plan.overageSpeedMbps / maxSpeed) * 100)
-      : 0;
 
-    return [priceScore, dataScore, voiceScore, smsScore, speedScore];
-  }, []);
+      return [priceScore, dataScore, voiceScore, smsScore, speedScore];
+    },
+    [plans],
+  );
 
   const plan1Scores = useMemo(
     () => calculateChartData(plan1),
@@ -123,6 +141,20 @@ export default function PlanCompare() {
       },
     },
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <Header />
+        <div className={styles.container}>
+          <div className={styles.loadingMessage}>
+            요금제 정보를 불러오는 중...
+          </div>
+        </div>
+        <BottomNav />
+      </Layout>
+    );
+  }
 
   if (!plan1 || !plan2) {
     return (
@@ -202,16 +234,17 @@ export default function PlanCompare() {
                   {plan1.overageSpeedMbps ?? 0}Mbps
                 </span>
               </div>
-              {plan1.subscriptionServices.length > 0 && (
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>OTT:</span>
-                  <span className={styles.detailValue}>
-                    {plan1.subscriptionServices
-                      .map((s) => OTT_LABELS[s])
-                      .join(', ')}
-                  </span>
-                </div>
-              )}
+              {plan1.subscriptionServices &&
+                plan1.subscriptionServices.length > 0 && (
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>OTT:</span>
+                    <span className={styles.detailValue}>
+                      {plan1.subscriptionServices
+                        .map((s) => OTT_LABELS[s])
+                        .join(', ')}
+                    </span>
+                  </div>
+                )}
             </div>
           </div>
 
@@ -254,16 +287,17 @@ export default function PlanCompare() {
                   {plan2.overageSpeedMbps ?? 0}Mbps
                 </span>
               </div>
-              {plan2.subscriptionServices.length > 0 && (
-                <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>OTT:</span>
-                  <span className={styles.detailValue}>
-                    {plan2.subscriptionServices
-                      .map((s) => OTT_LABELS[s])
-                      .join(', ')}
-                  </span>
-                </div>
-              )}
+              {plan2.subscriptionServices &&
+                plan2.subscriptionServices.length > 0 && (
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>OTT:</span>
+                    <span className={styles.detailValue}>
+                      {plan2.subscriptionServices
+                        .map((s) => OTT_LABELS[s])
+                        .join(', ')}
+                    </span>
+                  </div>
+                )}
             </div>
           </div>
         </div>

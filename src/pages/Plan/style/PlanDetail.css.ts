@@ -196,6 +196,13 @@ export const applyButton = style({
   },
 });
 
+export const loadingMessage = style({
+  textAlign: 'center',
+  color: '#6b7280',
+  padding: '32px 0',
+  fontSize: '16px',
+});
+
 export const errorMessage = style({
   textAlign: 'center',
   fontSize: '18px',
@@ -217,7 +224,7 @@ export const modalOverlay = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  zIndex: 1000,
+  zIndex: 2000, // BottomNav의 zIndex(1000)보다 높게 설정
 });
 
 export const modalContent = style({

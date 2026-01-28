@@ -141,6 +141,13 @@ export const chartTitle = style({
   textAlign: 'center',
 });
 
+export const loadingMessage = style({
+  textAlign: 'center',
+  color: '#6b7280',
+  padding: '32px 0',
+  fontSize: '16px',
+});
+
 export const errorMessage = style({
   textAlign: 'center',
   fontSize: '18px',
