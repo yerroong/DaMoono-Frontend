@@ -4,10 +4,15 @@ import { CounselCard } from './CounselCard';
 
 interface CounselCardListProps {
   items: CounselItem[];
-  onSummarize: (id: string) => void;
+  onSummarize: (sessionId: string) => void;
+  onGetSummary: (sessionId: string) => void;
 }
 
-export function CounselCardList({ items, onSummarize }: CounselCardListProps) {
+export function CounselCardList({
+  items,
+  onSummarize,
+  onGetSummary,
+}: CounselCardListProps) {
   const grouped = items.reduce<Record<string, CounselItem[]>>((acc, cur) => {
     acc[cur.date] = acc[cur.date] ?? [];
     acc[cur.date].push(cur);
@@ -26,6 +31,7 @@ export function CounselCardList({ items, onSummarize }: CounselCardListProps) {
               content={item.content}
               summarized={item.summarized}
               onSummarize={() => onSummarize(item.id)}
+              onGetSummary={() => onGetSummary(item.id)}
             />
           ))}
         </section>
