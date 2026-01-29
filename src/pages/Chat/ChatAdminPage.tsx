@@ -119,8 +119,8 @@ export default function ChatAdminPage() {
       const normalizedSessions = sessions.map((session) => {
         let userName = session.userName;
 
-        if (!userName && (session as any).userId) {
-          const userIdObj = (session as any).userId;
+        if (!userName && 'userId' in session && session.userId) {
+          const userIdObj = session.userId as { userName?: string };
           userName = userIdObj.userName || '게스트';
         }
 
@@ -145,8 +145,8 @@ export default function ChatAdminPage() {
       const normalizedSessions = sessions.map((session) => {
         let userName = session.userName;
 
-        if (!userName && (session as any).userId) {
-          const userIdObj = (session as any).userId;
+        if (!userName && 'userId' in session && session.userId) {
+          const userIdObj = session.userId as { userName?: string };
           userName = userIdObj.userName || '게스트';
         }
 
@@ -258,6 +258,7 @@ export default function ChatAdminPage() {
   }, []);
 
   // 메시지가 추가될 때마다 스크롤을 아래로
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 메시지 변경 시에만 스크롤 필요
   useEffect(() => {
     // requestAnimationFrame을 두 번 사용하여 DOM 렌더링을 확실히 기다림
     requestAnimationFrame(() => {
@@ -268,7 +269,7 @@ export default function ChatAdminPage() {
         });
       });
     });
-  }, []);
+  }, [messages]);
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim() || !sessionId || isConsultEnded) {
@@ -683,7 +684,6 @@ export default function ChatAdminPage() {
                       )}
                     </div>
                   ))}
-                  <div ref={messagesEndRef} />
                   {isUserTyping && (
                     <div className={styles.userMessageContainer}>
                       <div className={styles.userHeader}>
@@ -715,6 +715,7 @@ export default function ChatAdminPage() {
                       </div>
                     </div>
                   )}
+                  <div ref={messagesEndRef} />
                 </div>
               )}
             </div>

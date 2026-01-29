@@ -137,7 +137,7 @@ export default function ChatConsultPage() {
     };
   }, [navigate]);
 
-  // 메시지가 추가될 때마다 스크롤을 아래로
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 메시지 변경 시에만 스크롤 필요
   useEffect(() => {
     // requestAnimationFrame을 두 번 사용하여 DOM 렌더링을 확실히 기다림
     requestAnimationFrame(() => {
@@ -148,7 +148,7 @@ export default function ChatConsultPage() {
         });
       });
     });
-  }, []);
+  }, [messages]);
 
   const handleSendMessage = async (content: string) => {
     // Socket으로만 메시지 전송 (로컬 상태에 추가하지 않음)
@@ -396,7 +396,7 @@ export default function ChatConsultPage() {
                   )}
                 </div>
               ))}
-              <div ref={messagesEndRef} />
+
               {isConsultantTyping && (
                 <div className={styles.assistantMessageContainer}>
                   <div className={styles.assistantHeader}>
@@ -418,6 +418,7 @@ export default function ChatConsultPage() {
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
           )}
         </div>
