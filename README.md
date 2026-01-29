@@ -125,5 +125,5 @@ LangChain + OpenAI API
 | ![profile]() | **류종현**<br/>[@jonghyunRyu](https://github.com/jonghyunRyu) | **Frontend**<br/>마이페이지 및 관리자 페이지 UI 구현, 상담 이력·이용 데이터 시각화, 요금제·구독 정보 조회 UI 개발, 다중 데이터 로딩 렌더링 최적화 및 3D 로딩 UI 적용 |
 | ![profile]() | **양해강**<br/>[@Inoansta](https://github.com/Inoansta) | **Backend · AI**<br/>백엔드 프로젝트 및 DB 초기 셋업, 회원가입·인증 API 구현, REST API 설계, 프론트엔드 연동 및 서비스 배포 환경 구성, AI 기능 연동을 위한 서버 구조 설계 |
 | ![profile]() | **이해니**<br/>[@haeni82](https://github.com/haeni82) | **Frontend**<br/>상담 요약 페이지(UI) 구현, 유저용 상담 요약 프롬프트(JSON) 설계, 상담사 WebSocket 양방향 통신 구조 설계, 상담 요약 및 후속 액션 제안 기능 기획 |
-| ![profile]() | **이혁준**<br/>[@Lilium0422](https://github.com/Lilium0422) | **Frontend**<br/>홈·온보딩·맞춤형 서비스 추천 페이지 UI 및 컴포넌트 구현, 사용자 분석 로직 설계, 공용 레이아웃(헤더·하단 메뉴) 및 서비스 가이드 UI 개발 |
+| ![profile]() | **이혁준**<br/>[@Lilium0422](https://github.com/Lilium0422) | **Frontend**<br/>홈·로그인·회원가입·온보딩·맞춤형 서비스 추천 페이지 UI 및 컴포넌트 구현, 사용자 분석 로직 설계, 공용 레이아웃(헤더·하단 메뉴) 및 서비스 가이드 UI 개발 |
 | ![profile]() | **유덕현**<br/>[@Ydh0622](https://github.com/Ydh0622) | **Frontend**<br/>FAQ 페이지 및 군인·미성년자·대리인 가입 시 구비 서류 안내 UI 구현, 이미지 애니메이션 및 인터랙션 마무리 |
