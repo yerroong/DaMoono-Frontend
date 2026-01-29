@@ -138,6 +138,11 @@ const SummaryPage = () => {
   const location = useLocation();
   // 넘겨받은 데이터가 없을 경우를 대비해 기본값 설정
   const summaryData = location.state?.summaryData || MOCK_SUMMARY_DATA;
+  const from = location.state?.from || 'mypage';
+  const backButtonConfig =
+    from === 'chat'
+      ? { targetPath: '/chat', label: '채팅 화면으로 돌아가기' }
+      : { targetPath: '/mypage', label: '마이페이지로 돌아가기' };
 
   return (
     // 1. 전체 레이아웃 틀로 감싸기
@@ -191,7 +196,10 @@ const SummaryPage = () => {
           )}
         </motion.section>
 
-        <BackButton targetPath="/chat" label="채팅 화면으로 돌아가기" />
+        <BackButton
+          targetPath={backButtonConfig.targetPath}
+          label={backButtonConfig.label}
+        />
       </motion.div>
 
       {/* 4. 네비게이션 */}
