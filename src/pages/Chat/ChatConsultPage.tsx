@@ -248,6 +248,8 @@ export default function ChatConsultPage() {
     } else {
       // 상담 진행 중인 경우 확인
       if (window.confirm('상담을 나가시겠습니까?')) {
+        // 소켓 연결 종료
+        socketService.endConsult();
         navigate('/chat');
       }
     }
