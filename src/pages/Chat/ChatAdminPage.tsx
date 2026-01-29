@@ -67,7 +67,7 @@ export default function ChatAdminPage() {
 
           // 2. 관리자 요약 페이지로 데이터와 함께 이동
           navigate('/admin-summary', {
-            state: { summaryData: response.data.payload.payload },
+            state: { summaryData: response.data.payload },
           });
         }
       } catch (error) {

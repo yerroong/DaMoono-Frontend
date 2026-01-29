@@ -7,15 +7,17 @@ interface ReportCardProps {
     outcome: { value: string; reason: string };
     re_contact: { value: string; reason: string };
   };
+  user?: string;
 }
 
-export default function ReportCard({ data }: ReportCardProps) {
+export default function ReportCard({ data, user }: ReportCardProps) {
   if (!data) return null;
+  console.log(user);
   return (
     <div className={s.CardContainer}>
       <div className={s.header}>
         <Badge category={data.category} />
-        <p>OOO 고객 상담 요약</p>
+        <p>{user} 고객 상담 요약</p>
       </div>
 
       <div className={s.content}>

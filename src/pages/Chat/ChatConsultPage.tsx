@@ -151,9 +151,11 @@ export default function ChatConsultPage() {
 
       // response.data 전체가 아니라 .payload만 넘깁니다.
       navigate('/summary', {
-        state: { summaryData: response.data.payload },
+        state: {
+          summaryData: response.data.payload,
+          from: 'chat', // 채팅에서 왔다는 정보 추가
+        },
       });
-
       setModalType(null);
       // 플래그는 navigate 후에 정리
       sessionStorage.removeItem('is_user_summarizing');
