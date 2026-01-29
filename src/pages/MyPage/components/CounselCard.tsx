@@ -3,17 +3,33 @@ import * as css from '../styles/Counsel.css';
 interface CounselCardProps {
   content: string;
   summarized: boolean;
-  onSummarize?: () => void;
+  onSummarize: () => void;
+  onGetSummary: () => void;
 }
 
 export function CounselCard({
   content,
   summarized,
   onSummarize,
+  onGetSummary,
 }: CounselCardProps) {
   return (
-    <div className={css.card}>
-      <div className={css.cardHeader}>
+    // biome-ignore lint/a11y/useKeyWithClickEvents: 카드 전체 클릭 UX를 위해 의도적으로 div 사용
+    // biome-ignore lint/a11y/noStaticElementInteractions: button 중첩 방지
+    <div
+      className={css.card}
+      onClick={summarized ? onGetSummary : undefined}
+      onKeyDown={
+        summarized
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                onGetSummary();
+              }
+            }
+          : undefined
+      }
+    >
+      <div>
         {summarized ? (
           <span className={css.done}>✔ 요약됨</span>
         ) : (

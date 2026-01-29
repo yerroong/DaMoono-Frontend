@@ -71,20 +71,25 @@ export const card = style({
   width: '100%',
   backgroundColor: '#fff',
   borderRadius: '12px',
-  padding: '14px',
+  padding: '10px 14px',
   boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
   position: 'relative',
-
+  cursor: 'pointer',
   minHeight: '60px',
   display: 'flex',
   flexDirection: 'column',
   gap: '15px',
+  transition: 'transform 0.3s ease',
+
+  selectors: {
+    '&:hover': {
+      transform: 'translateY(-2px)',
+    },
+  },
 });
 
-export const cardHeader = style({});
-
 export const done = style({
-  fontSize: '12px',
+  fontSize: '10px',
   fontWeight: 600,
   color: '#1E7F43',
   backgroundColor: '#E6F4EA',
@@ -94,7 +99,7 @@ export const done = style({
 });
 
 export const pending = style({
-  fontSize: '12px',
+  fontSize: '10px',
   fontWeight: 600,
   color: '#C0267C',
   backgroundColor: '#FCE7F3',
@@ -113,13 +118,13 @@ export const content = style({
   textOverflow: 'ellipsis',
 
   paddingRight: '80px',
-  marginBottom: '12px',
+  marginBottom: '6px',
 });
 
 export const summaryBtn = style({
   position: 'absolute',
   right: '12px',
-  bottom: '30px',
+  bottom: '25px',
 
   fontSize: '13px',
   fontWeight: '500',
