@@ -95,9 +95,14 @@ export default function ChatConsultPage() {
   // 메시지가 추가될 때마다 스크롤을 아래로
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+      const _ = messages.length;
+      // 부드럽게 스크롤 되도록 behavior 추가
+      contentRef.current.scrollTo({
+        top: contentRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
     }
-  });
+  }, [messages]);
 
   const handleSendMessage = async (content: string) => {
     // Socket으로만 메시지 전송 (로컬 상태에 추가하지 않음)
@@ -224,8 +229,8 @@ export default function ChatConsultPage() {
 
       <Header />
 
-      <div className={styles.container}>
-        {/* 헤더 */}
+      {/* 헤더 */}
+      <div className={styles.headerWrapper}>
         <ChatHeader
           title="상담사와 대화하기"
           showActions={true}
@@ -234,7 +239,9 @@ export default function ChatConsultPage() {
           onSummary={handleSummary}
           onBack={handleBack}
         />
+      </div>
 
+      <div className={styles.container}>
         {/* 상담 상태 */}
         <div className={styles.statusContainer}>
           <div className={styles.statusHeader}>
@@ -310,8 +317,6 @@ export default function ChatConsultPage() {
             </div>
           )}
         </div>
-
-        {/* 입력 영역 */}
         <ChatInput
           onSendMessage={handleSendMessage}
           isLoading={isLoading}

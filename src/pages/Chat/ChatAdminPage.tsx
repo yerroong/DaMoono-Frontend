@@ -143,9 +143,14 @@ export default function ChatAdminPage() {
   // 메시지가 추가될 때마다 스크롤을 아래로
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+      const _ = messages.length;
+      // 부드럽게 스크롤 되도록 behavior 추가
+      contentRef.current.scrollTo({
+        top: contentRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
     }
-  });
+  }, [messages]);
 
   const handleSendMessage = async (content: string) => {
     socketService.sendMessage(content, 'consultant');
