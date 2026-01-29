@@ -78,7 +78,12 @@ export default function Counsel() {
       console.log(res);
       if (res.status === 200 || res.status === 201) {
         // /summary 페이지로 이동
-        navigate('/summary', { state: { summaryData: res.data.payload } });
+        navigate('/summary', {
+          state: {
+            summaryData: res.data.payload,
+            from: 'mypage', // 또는 from을 생략하면 기본값이 'mypage'
+          },
+        });
       }
     } catch (e) {
       console.error('요약 생성 실패', e);
